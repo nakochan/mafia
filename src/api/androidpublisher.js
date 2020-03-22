@@ -110,7 +110,7 @@ router.get('/token/redirect', async ctx => {
 })
 
 router.get('/receipt/validation', async ctx => {
-    const packageName = 'com.sandspoons.detective'
+    const packageName = 'com.sandspoons.mafia'
     const {
         userId,
         transactionId,
