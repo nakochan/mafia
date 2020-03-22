@@ -7,7 +7,7 @@ module.exports = (function () {
 
     return class Data {
         static async loadData() {
-            await Data.loadMaps()
+            // await Data.loadMaps()
             await Data.loadShops()
             await Data.loadItems()
             await Data.loadRanks()
