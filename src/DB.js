@@ -62,7 +62,7 @@ module.exports = {
                     nm.created,
                     nm.deleted,
                     u.name author,
-                    u.blue_graphics avatar
+                    u.pure_graphics avatar
                 FROM notice_messages nm
                 LEFT JOIN users u ON u.id = nm.target_id
                 WHERE nm.user_id = ? AND ${deleted ? '!' : ''}ISNULL(nm.deleted)
@@ -83,7 +83,7 @@ module.exports = {
                     u.kill,
                     u.death,
                     u.assist,
-                    u.blue_graphics avatar,
+                    u.pure_graphics avatar,
                     u.memo,
                     u.admin,
                     c.name clanname
@@ -155,7 +155,7 @@ module.exports = {
                     u.id,
                     u.name,
                     u.level,
-                    u.blue_graphics avatar,
+                    u.pure_graphics avatar,
                     date_format(u.updated, '%Y-%m-%d') updated,
                     cm.level clanLevel,
                     cm.exp clanExp,
@@ -213,7 +213,7 @@ module.exports = {
                     nm.deleted,
                     nm.rewarded,
                     u.name author,
-                    u.blue_graphics avatar
+                    u.pure_graphics avatar
                 FROM notice_messages nm
                 LEFT JOIN users u ON u.id = nm.target_id
                 WHERE nm.id = ?
@@ -293,7 +293,7 @@ module.exports = {
     },
     async UpdateUser(user) {
         try {
-            await this.query('UPDATE users SET `uuid` = ?, `sex` = ?, `level` = ?, `exp` = ?, `coin` = ?, `cash` = ?, `point` = ?, `kill` = ?, `death` = ?, `assist` = ?, `blast` = ?, `rescue` = ?, `rescue_combo` = ?, `survive` = ?, `escape` = ?, `red_graphics` = ?, `blue_graphics` = ?, `memo` = ?, `last_chat` = ? WHERE `id` = ?', [
+            await this.query('UPDATE users SET `uuid` = ?, `sex` = ?, `level` = ?, `exp` = ?, `coin` = ?, `cash` = ?, `point` = ?, `kill` = ?, `death` = ?, `assist` = ?, `blast` = ?, `rescue` = ?, `rescue_combo` = ?, `survive` = ?, `escape` = ?, `dead_graphics` = ?, `pure_graphics` = ?, `memo` = ?, `last_chat` = ? WHERE `id` = ?', [
                 user.verify.uuid,
                 user.sex,
                 user.level,
@@ -309,8 +309,8 @@ module.exports = {
                 user.rescueCombo,
                 user.survive,
                 user.escape,
-                user.redGraphics,
-                user.blueGraphics,
+                user.deadGraphics,
+                user.pureGraphics,
                 user.memo,
                 user.lastChatTime,
                 user.id

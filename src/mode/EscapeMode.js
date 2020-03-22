@@ -139,7 +139,7 @@ module.exports = class EscapeMode {
 
     join(self) {
         self.game = this.gameObject()
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
         this.blueTeam.push(self)
         switch (this.state) {
             case STATE_READY:
@@ -201,7 +201,7 @@ module.exports = class EscapeMode {
         if (self.game.camera || target.game.camera)
             return false
         target.game.team = TeamType.RED
-        target.setGraphics(target.redGraphics)
+        target.setGraphics(target.deadGraphics)
         target.send(Serialize.SetGameTeam(target))
         target.send(Serialize.DeadAnimation())
         this.drawAkari(target)
@@ -276,7 +276,7 @@ module.exports = class EscapeMode {
                 break
         }
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
         self.publish(Serialize.UpdateModeCount(this.score.blue))
     }
 
@@ -387,7 +387,7 @@ module.exports = class EscapeMode {
                             this.blueTeam.splice(this.blueTeam.indexOf(lotto), 1)
                             this.redTeam.push(lotto)
                             lotto.game.team = TeamType.RED
-                            lotto.setGraphics(lotto.redGraphics)
+                            lotto.setGraphics(lotto.deadGraphics)
                             if (lotto.state === PlayerState.Tansu) {
                                 lotto.setState('Basic')
                                 lotto.send(Serialize.LeaveWardrobe())

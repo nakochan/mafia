@@ -80,12 +80,12 @@ module.exports = class HideMode {
         switch (this.state) {
             case STATE_READY:
                 self.game.team = TeamType.BLUE
-                self.setGraphics(self.blueGraphics)
+                self.setGraphics(self.pureGraphics)
                 this.blueTeam.push(self)
                 break
             case STATE_GAME:
                 self.game.team = TeamType.RED
-                self.setGraphics(self.redGraphics)
+                self.setGraphics(self.deadGraphics)
                 this.redTeam.push(self)
                 self.send(Serialize.NoticeMessage('사물로 변신한 인간을 모두 색출하라.'))
                 self.send(Serialize.PlaySound('A4'))
@@ -147,7 +147,7 @@ module.exports = class HideMode {
         if (self.game.team === target.game.team)
             return false
         target.game.team = TeamType.RED
-        target.setGraphics(target.redGraphics)
+        target.setGraphics(target.deadGraphics)
         target.send(Serialize.SetGameTeam(target))
         target.send(Serialize.DeadAnimation())
         this.drawAkari(target)
@@ -235,7 +235,7 @@ module.exports = class HideMode {
                 break
         }
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
         self.publish(Serialize.UpdateModeCount(this.blueTeam.length))
     }
 
@@ -360,7 +360,7 @@ module.exports = class HideMode {
                             this.redTeam.push(lotto)
                             this.moveToBase(lotto)
                             lotto.game.team = TeamType.RED
-                            lotto.setGraphics(lotto.redGraphics)
+                            lotto.setGraphics(lotto.deadGraphics)
                             if (lotto.state === PlayerState.Tansu) {
                                 lotto.setState('Basic')
                                 lotto.send(Serialize.LeaveWardrobe())

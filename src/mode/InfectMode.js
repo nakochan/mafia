@@ -81,12 +81,12 @@ module.exports = class InfectMode {
         switch (this.state) {
             case STATE_READY:
                 self.game.team = TeamType.BLUE
-                self.setGraphics(self.blueGraphics)
+                self.setGraphics(self.pureGraphics)
                 this.blueTeam.push(self)
                 break
             case STATE_GAME:
                 self.game.team = TeamType.RED
-                self.setGraphics(self.redGraphics)
+                self.setGraphics(self.deadGraphics)
                 this.redTeam.push(self)
                 self.send(Serialize.NoticeMessage('모든 인간을 남김 없이 감염시켜라.'))
                 self.send(Serialize.PlaySound('A4'))
@@ -147,7 +147,7 @@ module.exports = class InfectMode {
         if (target.game.vaccine) {
             target.game.vaccine = false
             self.game.team = TeamType.BLUE
-            self.setGraphics(self.blueGraphics)
+            self.setGraphics(self.pureGraphics)
             this.blueTeam.push(self)
             this.redTeam.splice(this.redTeam.indexOf(self), 1)
             self.publish(Serialize.NoticeMessage(self.name + (pix.maker(self.name) ? '가 ' : '이 ') + target.name + '의 보급품 사용!'))
@@ -156,7 +156,7 @@ module.exports = class InfectMode {
             return true
         }
         target.game.team = TeamType.RED
-        target.setGraphics(target.redGraphics)
+        target.setGraphics(target.deadGraphics)
         target.send(Serialize.SetGameTeam(target))
         target.send(Serialize.DeadAnimation())
         this.drawAkari(target)
@@ -216,7 +216,7 @@ module.exports = class InfectMode {
                 break
         }
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
         self.publish(Serialize.UpdateModeCount(this.blueTeam.length))
     }
 
@@ -340,7 +340,7 @@ module.exports = class InfectMode {
                             this.blueTeam.splice(this.blueTeam.indexOf(lotto), 1)
                             this.redTeam.push(lotto)
                             lotto.game.team = TeamType.RED
-                            lotto.setGraphics(lotto.redGraphics)
+                            lotto.setGraphics(lotto.deadGraphics)
                             if (lotto.state === PlayerState.Tansu) {
                                 lotto.setState('Basic')
                                 lotto.send(Serialize.LeaveWardrobe())

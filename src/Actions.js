@@ -443,7 +443,7 @@ class BoxState {
             self.publish(Serialize.NoticeMessage('생존자 ' + self.name + (pix.maker(self.name) ? '가' : '이') + ' 보급품 획득!'))
         } else {
             self.game.team = TeamType.BLUE
-            self.setGraphics(self.blueGraphics)
+            self.setGraphics(self.pureGraphics)
             self.send(Serialize.SetGameTeam(self))
             mode.drawAkari(self)
             mode.blueTeam.push(self)

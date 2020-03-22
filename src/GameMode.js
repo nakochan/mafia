@@ -20,13 +20,13 @@ module.exports = class GameMode {
 
     join(self) {
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
         this.moveToBase(self)
     }
 
     leave(self) {
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
     }
 
     drawAkari(self) {

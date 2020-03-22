@@ -47,7 +47,7 @@ module.exports = class ProtectMode {
     join(self) {
         self.game = this.gameObject()
         self.game.team = TeamType.BLUE
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
         this.blueTeam.push(self)
         this.moveToBase(self)
         switch (this.state) {
@@ -158,7 +158,7 @@ module.exports = class ProtectMode {
     leave(self) {
         this.blueTeam.splice(this.blueTeam.indexOf(self), 1)
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
     }
 
     gameObject() {

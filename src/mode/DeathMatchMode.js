@@ -112,20 +112,20 @@ module.exports = class DeathMatchMode {
         switch (this.state) {
             case STATE_READY:
                 self.game.team = TeamType.BLUE
-                self.setGraphics(self.blueGraphics)
+                self.setGraphics(self.pureGraphics)
                 this.blueTeam.push(self)
                 this.moveToBase(self)
                 break
             case STATE_GAME:
                 if (this.redTeam.length < parseInt(this.blueTeam.length - 2)) {
                     self.game.team = TeamType.RED
-                    self.setGraphics(self.redGraphics)
+                    self.setGraphics(self.deadGraphics)
                     this.redTeam.push(self)
                     this.moveToKickOut(self)
                     self.send(Serialize.NoticeMessage('모든 인간을 섬멸하라.'))
                 } else {
                     self.game.team = TeamType.BLUE
-                    self.setGraphics(self.blueGraphics)
+                    self.setGraphics(self.pureGraphics)
                     this.blueTeam.push(self)
                     this.moveToBase(self)
                     self.send(Serialize.NoticeMessage('모든 오니를 소탕하라.'))
@@ -246,7 +246,7 @@ module.exports = class DeathMatchMode {
                 break
         }
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
     }
 
     gameObject() {
@@ -367,7 +367,7 @@ module.exports = class DeathMatchMode {
                             this.redTeam.push(lotto)
                             this.moveToKickOut(lotto)
                             lotto.game.team = TeamType.RED
-                            lotto.setGraphics(lotto.redGraphics)
+                            lotto.setGraphics(lotto.deadGraphics)
                             if (lotto.state === PlayerState.Tansu) {
                                 lotto.setState('Basic')
                                 lotto.send(Serialize.LeaveWardrobe())

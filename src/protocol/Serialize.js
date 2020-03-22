@@ -28,8 +28,8 @@ my.UserData = function (user) {
     packet.survive = user.survive
     packet.escape = user.escape
     packet.graphics = user.graphics
-    packet.redGraphics = user.redGraphics
-    packet.blueGraphics = user.blueGraphics
+    packet.pureGraphics = user.pureGraphics
+    packet.deadGraphics = user.deadGraphics
     packet.memo = user.memo
     packet.admin = user.admin
     return JSON.stringify(packet)

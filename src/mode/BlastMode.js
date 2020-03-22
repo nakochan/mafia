@@ -114,18 +114,18 @@ module.exports = class BlastMode {
         switch (this.state) {
             case STATE_READY:
                 self.game.team = TeamType.BLUE
-                self.setGraphics(self.blueGraphics)
+                self.setGraphics(self.pureGraphics)
                 this.blueTeam.push(self)
                 break
             case STATE_GAME:
                 if (this.redTeam.length >= this.blueTeam.length) {
                     self.game.team = TeamType.RED
-                    self.setGraphics(self.redGraphics)
+                    self.setGraphics(self.deadGraphics)
                     this.redTeam.push(self)
                     self.send(Serialize.NoticeMessage('인간의 폭발물 설치를 저지하라.'))
                 } else {
                     self.game.team = TeamType.BLUE
-                    self.setGraphics(self.blueGraphics)
+                    self.setGraphics(self.pureGraphics)
                     this.blueTeam.push(self)
                     self.send(Serialize.NoticeMessage('폭발물을 설치하여 폭파하라.'))
                 }
@@ -246,7 +246,7 @@ module.exports = class BlastMode {
                 break
         }
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
     }
 
     gameObject() {
@@ -367,7 +367,7 @@ module.exports = class BlastMode {
                             this.redTeam.push(lotto)
                             this.moveToKickOut(lotto)
                             lotto.game.team = TeamType.RED
-                            lotto.setGraphics(lotto.redGraphics)
+                            lotto.setGraphics(lotto.deadGraphics)
                             if (lotto.state === PlayerState.Tansu) {
                                 lotto.setState('Basic')
                                 lotto.send(Serialize.LeaveWardrobe())

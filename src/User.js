@@ -48,9 +48,9 @@ global.User = (function () {
             this.rescueCombo = 0
             this.survive = 0
             this.escape = 0
-            this.graphics = 'Mania'
-            this.redGraphics = 'ao'
-            this.blueGraphics = this.graphics
+            this.graphics = 'KJT'
+            this.pureGraphics = this.graphics
+            this.deadGraphics = 'Cat'
             this.memo = ''
             this.lastChatTime = new Date()
             this.alert = 0
@@ -168,9 +168,9 @@ global.User = (function () {
             this.rescueCombo = user.rescue_combo
             this.survive = user.survive
             this.escape = user.escape
-            this.graphics = user.blueGraphics
-            this.redGraphics = user.red_graphics
-            this.blueGraphics = user.blue_graphics
+            this.graphics = user.pure_graphics
+            this.pureGraphics = user.pure_graphics
+            this.deadGraphics = user.dead_graphics
             this.memo = user.memo
             this.lastChatTime = new Date(user.last_chat)
             this.admin = user.admin
@@ -453,9 +453,9 @@ global.User = (function () {
                 //'YuzuhaBlue'
             ]
             const i = Math.floor(Math.random() * skins.length)
-            this.blueGraphics = skins[i]
+            this.pureGraphics = skins[i]
             this.coin -= 5000
-            this.send(Serialize.TempSkinBuy(this.blueGraphics, this.coin))
+            this.send(Serialize.TempSkinBuy(this.pureGraphics, this.coin))
         }
 
         async getBilling() {
@@ -527,7 +527,7 @@ global.User = (function () {
             const item = Shop.get(id)
             if (!item)
                 return
-            if (item.type === 'SKIN' || item.type === 'RED_SKIN') {
+            if (item.type === 'SKIN' || item.type === 'DEAD_SKIN') {
                 const check = this.inventory.find(i => i.id === id)
                 this.send(Serialize.GetSkinItem(item, check ? moment(check.expiry, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss') : '-'))
             }
@@ -550,7 +550,7 @@ global.User = (function () {
                 this.addItem(data.id, data.num)
                 this.send(Serialize.MessageShop('BUY_SUCCESS'))
                 this.send(Serialize.UpdateCashAndCoin(this.cash, this.coin))
-            } else if (item.type === 'SKIN' || item.type === 'RED_SKIN') {
+            } else if (item.type === 'SKIN' || item.type === 'DEAD_SKIN') {
                 if (item.isCash) {
                     if (this.cash < item.cost * data.days)
                         return this.send(Serialize.MessageShop('NOT_ENOUGH_CASH'))
@@ -579,9 +579,9 @@ global.User = (function () {
                     this.send(Serialize.MessageShop('BUY_SUCCESS'))
                 }
                 if (item.type === 'SKIN')
-                    this.blueGraphics = item.icon
-                else if (item.type === 'RED_SKIN')
-                    this.redGraphics = item.icon
+                    this.pureGraphics = item.icon
+                else if (item.type === 'DEAD_SKIN')
+                    this.deadGraphics = item.icon
                 this.send(Serialize.UpdateCashAndCoin(this.cash, this.coin))
             }
         }
@@ -595,15 +595,15 @@ global.User = (function () {
                 const item = Shop.get(i.id)
                 if (!item)
                     return
-                if (item.type === 'SKIN' && item.icon === this.blueGraphics) {
+                if (item.type === 'SKIN' && item.icon === this.pureGraphics) {
                     const min = moment().diff(moment(i.expiry), 'minutes')
                     if (min > 0)
-                        this.blueGraphics = 'Mania'
+                        this.pureGraphics = 'KJT'
                 }
-                if (item.type === 'RED_SKIN' && item.icon === this.redGraphics) {
+                if (item.type === 'DEAD_SKIN' && item.icon === this.deadGraphics) {
                     const min = moment().diff(moment(i.expiry), 'minutes')
                     if (min > 0)
-                        this.redGraphics = 'ao'
+                        this.deadGraphics = 'Cat'
                 }
             })
         }
@@ -614,7 +614,7 @@ global.User = (function () {
                 const item = Shop.get(i.id)
                 if (!item)
                     return
-                if (item.type === 'SKIN' || item.type === 'RED_SKIN') {
+                if (item.type === 'SKIN' || item.type === 'DEAD_SKIN') {
                     const min = moment().diff(moment(i.expiry), 'minutes')
                     if (min < 0) {
                         skins.push({
@@ -744,7 +744,7 @@ global.User = (function () {
 
         setSkin(id) {
             if (id < 1)
-                this.blueGraphics = 'Mania'
+                this.pureGraphics = 'KJT'
             else {
                 const check = this.inventory.find(i => i.id === id)
                 if (!check)
@@ -756,9 +756,9 @@ global.User = (function () {
                 if (min > 0)
                     return
                 if (item.type === 'SKIN')
-                    this.blueGraphics = item.icon
-                else if (item.type === 'RED_SKIN')
-                    this.redGraphics = item.icon
+                    this.pureGraphics = item.icon
+                else if (item.type === 'DEAD_SKIN')
+                    this.deadGraphics = item.icon
             }
             this.send(Serialize.UserData(this))
         }

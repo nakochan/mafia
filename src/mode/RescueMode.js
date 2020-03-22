@@ -174,14 +174,14 @@ module.exports = class RescueMode {
         switch (this.state) {
             case STATE_READY:
                 self.game.team = TeamType.BLUE
-                self.setGraphics(self.blueGraphics)
+                self.setGraphics(self.pureGraphics)
                 this.blueTeam.push(self)
                 this.moveToBase(self)
                 break
             case STATE_GAME:
                 self.game.team = TeamType.BLUE
                 self.game.caught = true
-                self.setGraphics(self.blueGraphics)
+                self.setGraphics(self.pureGraphics)
                 this.blueTeam.push(self)
                 this.moveToPrison(self)
                 ++this.score.red
@@ -275,7 +275,7 @@ module.exports = class RescueMode {
                 break
         }
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
         self.publish(Serialize.UpdateModeCount(this.score.red))
     }
 
@@ -391,7 +391,7 @@ module.exports = class RescueMode {
                             this.blueTeam.splice(this.blueTeam.indexOf(lotto), 1)
                             this.redTeam.push(lotto)
                             lotto.game.team = TeamType.RED
-                            lotto.setGraphics(lotto.redGraphics)
+                            lotto.setGraphics(lotto.deadGraphics)
                             if (lotto.state === PlayerState.Tansu) {
                                 lotto.setState('Basic')
                                 lotto.send(Serialize.LeaveWardrobe())

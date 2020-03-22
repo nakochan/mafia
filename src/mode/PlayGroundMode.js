@@ -22,7 +22,7 @@ module.exports = class PlayGroundMode {
 
     join(self) {
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
         self.teleport(79, 36, 24)
         this.drawAkari(self)
         self.send(Serialize.SystemMessage('<color=yellow>[확성기] 채팅 앞에 #를 붙이면 보석 20개로 확성기를 사용하실 수 있습니다.</color>'))
@@ -30,7 +30,7 @@ module.exports = class PlayGroundMode {
 
     leave(self) {
         self.game = {}
-        self.setGraphics(self.blueGraphics)
+        self.setGraphics(self.pureGraphics)
     }
 
     drawAkari(self) {

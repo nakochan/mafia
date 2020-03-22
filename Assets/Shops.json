@@ -1022,7 +1022,7 @@
         },
         {
             "id": 69,
-            "type": "RED_SKIN",
+            "type": "DEAD_SKIN",
             "icon": "ao2",
             "name": "젤리 오니",
             "creator": "화이트",
@@ -1157,7 +1157,7 @@
         },
         {
             "id": 78,
-            "type": "RED_SKIN",
+            "type": "DEAD_SKIN",
             "icon": "ao3",
             "name": "주술사 오니",
             "creator": "화이트",
@@ -1202,7 +1202,7 @@
         },
         {
             "id": 81,
-            "type": "RED_SKIN",
+            "type": "DEAD_SKIN",
             "icon": "ao4",
             "name": "고양이 오니",
             "creator": "또이339",
