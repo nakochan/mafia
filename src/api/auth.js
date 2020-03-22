@@ -11,7 +11,7 @@ dotenv.config()
 
 const { KEY } = process.env
 
-const OAUTH_ID = { GOOGLE: '112494846092-ar8ml4nm16mr7bhd3cekb87846fr5k0e.apps.googleusercontent.com' }
+const OAUTH_ID = { GOOGLE: '675757608831-813ltjsl390pt1atkg83jbhnqlodla76.apps.googleusercontent.com' }
 const LOGIN_TYPE = { GOOGLE: 0 }
 
 function VerifyGoogle(token) {
