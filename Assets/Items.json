@@ -1,0 +1,16 @@
+{
+    "items": [
+        {
+            "id": 1,
+            "num": 10,
+            "icon": "Fire",
+            "name": "화염방사기",
+            "description": "",
+            "cost": 10,
+            "method": {
+                "command": "Fire",
+                "arguments": {}
+            }
+        }
+    ]
+}

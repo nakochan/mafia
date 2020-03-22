@@ -1,0 +1,402 @@
+const Serialize = require('../protocol/Serialize')
+const { TeamType, ModeType, MapType } = require('../util/const')
+const PlayerState = require('../PlayerState')
+const Event = require('../Event')
+const pix = require('../util/pix')
+
+const STATE_READY = 0
+const STATE_GAME = 1
+const STATE_RESULT = 3
+
+module.exports = class HideMode {
+    constructor(roomId) {
+        this.roomId = roomId
+        this.redTeam = []
+        this.blueTeam = []
+        this.map = MapType.ASYLUM + parseInt(Math.random() * MapType.DESERT)
+        this.count = 230
+        this.maxCount = 230
+        this.score = {
+            red: 0,
+            blue: 0
+        }
+        this.tick = 0
+        this.state = STATE_READY
+        this.type = ModeType.HIDE
+        this.room = Room.get(this.roomId)
+        const objects = require('../../Assets/Mods/Mod' + ('' + 3).padStart(3, '0') + '.json')[this.map]
+        for (const object of objects) {
+            const event = new Event(this.roomId, object)
+            this.room.addEvent(event)
+        }
+    }
+
+    getJSON() {
+        return {
+            map: this.map,
+            mode: this.type,
+            count: this.count,
+            maxCount: this.maxCount,
+            red: this.score.red,
+            blue: this.score.blue,
+            persons: this.blueTeam.length
+        }
+    }
+
+    moveToBase(self) {
+        switch (this.map) {
+            case MapType.ASYLUM:
+                self.teleport(2, 8, 13)
+                break
+            case MapType.TATAMI:
+                self.teleport(42, 9, 7)
+                break
+            case MapType.GON:
+                self.teleport(60, 16, 11)
+                break
+            case MapType.LABORATORY:
+                self.teleport(99, 10, 8)
+                break
+            case MapType.SCHOOL:
+                self.teleport(149, 14, 8)
+                break
+            case MapType.MINE:
+                self.teleport(154, 9, 8)
+                break
+            case MapType.ISLAND:
+                self.teleport(199, 10, 8)
+                break
+            case MapType.MANSION:
+                self.teleport(226, 10, 9)
+                break
+            case MapType.DESERT:
+                self.teleport(249, 7, 17)
+                break
+        }
+    }
+
+    join(self) {
+        self.game = this.gameObject()
+        switch (this.state) {
+            case STATE_READY:
+                self.game.team = TeamType.BLUE
+                self.setGraphics(self.blueGraphics)
+                this.blueTeam.push(self)
+                break
+            case STATE_GAME:
+                self.game.team = TeamType.RED
+                self.setGraphics(self.redGraphics)
+                this.redTeam.push(self)
+                self.send(Serialize.NoticeMessage('사물로 변신한 인간을 모두 색출하라.'))
+                self.send(Serialize.PlaySound('A4'))
+                break
+        }
+        this.moveToBase(self)
+        this.drawAkari(self)
+        self.publishToMap(Serialize.SetGameTeam(self))
+        self.publish(Serialize.ModeData(this))
+        self.send(Serialize.SystemMessage('<color=yellow>[확성기] 채팅 앞에 #를 붙이면 보석 20개로 확성기를 사용하실 수 있습니다.</color>'))
+    }
+
+    drawAkari(self) {
+        self.send(Serialize.SwitchLight(self.game.team === TeamType.RED))
+    }
+
+    drawEvents(self) {
+        const { events } = this.room.places[self.place]
+        for (const event of events)
+            self.send(Serialize.CreateGameObject(event))
+    }
+
+    drawUsers(self) {
+        let selfHide = false
+        const sameMapUsers = this.room.sameMapUsers(self.place)
+        for (const user of sameMapUsers) {
+            if (self === user)
+                continue
+            if (user.state === PlayerState.Tansu)
+                continue
+            let userHide = false
+            if (self.game.team !== user.game.team) {
+                if (!(self.admin > 1 && user.admin > 1)) {
+                    if (self.admin > 1)
+                        selfHide = true
+                    else if (user.admin > 1)
+                        userHide = true
+                    else
+                        selfHide = userHide = true
+                }
+            } else if (self.game.team === TeamType.BLUE) {
+                if (!(self.admin > 1 && user.admin > 1)) {
+                    if (self.admin > 1)
+                        selfHide = true
+                    else if (user.admin > 1)
+                        userHide = true
+                    else
+                        selfHide = userHide = true
+                }
+            }
+            self.send(Serialize.CreateGameObject(user, userHide))
+            user.send(Serialize.CreateGameObject(self, selfHide))
+        }
+    }
+
+    attack(self, target) {
+        if (self.game.team === TeamType.BLUE)
+            return true
+        if (self.game.team === target.game.team)
+            return false
+        target.game.team = TeamType.RED
+        target.setGraphics(target.redGraphics)
+        target.send(Serialize.SetGameTeam(target))
+        target.send(Serialize.DeadAnimation())
+        this.drawAkari(target)
+        this.redTeam.push(target)
+        this.blueTeam.splice(this.blueTeam.indexOf(target), 1)
+        self.send(Serialize.NoticeMessage(target.name + (pix.maker(target.name) ? '를' : '을') + ' 맛있게 냠냠!!'))
+        self.send(Serialize.PlaySound('Eat'))
+        self.broadcast(Serialize.NoticeMessage(target.name + (pix.maker(target.name) ? '가' : '이') + ' 색출되어 ' + (this.blueTeam.length > 0 ? this.blueTeam.length + '명 은닉...' : '전멸.')))
+        self.broadcast(Serialize.PlaySound('Shock'))
+        self.publish(Serialize.UpdateModeCount(this.blueTeam.length))
+        switch (target.state) {
+            case PlayerState.Tansu:
+                ++self.score.killForWardrobe
+                ++target.score.deathForWardrobe
+                target.setState('Basic')
+                target.send(Serialize.LeaveWardrobe())
+                break
+            case PlayerState.Basic:
+                ++self.score.kill
+                ++target.score.death
+                break
+        }
+        this.room.draw(target)
+        return true
+    }
+
+    useItem(self) { }
+
+    change() {
+        for (const blue of this.blueTeam) {
+            const skins = [
+                '2door',
+                '170-Door01',
+                'Ball',
+                'Box',
+                'door-Blackwood',
+                'door-Blackwood_panel',
+                'door-Chocolatewood',
+                'iron',
+                'iron2',
+                'steel',
+                'tana_black',
+                'tana_red',
+                'tana_white',
+                'tansu',
+                'ud_toilet',
+                'Books',
+                'Bucket',
+                'Cactus',
+                'Cello',
+                'Chair',
+                'Flowerpot',
+                'Flowerpot2',
+                'Hanger',
+                'HumanBody',
+                'Laggage',
+                'MeasuringHeight',
+                'Mop',
+                'NoneBucket',
+                'Piano',
+                'Rice',
+                'Rion',
+                'Safety',
+                'Scale',
+                'Spot',
+                'TrashBox'
+            ]
+            const i = Math.floor(Math.random() * skins.length)
+            blue.setGraphics(skins[i])
+        }
+    }
+
+    doAction(self, event) {
+        event.doAction(self)
+        return true
+    }
+
+    leave(self) {
+        switch (self.game.team) {
+            case TeamType.RED:
+                this.redTeam.splice(this.redTeam.indexOf(self), 1)
+                break
+            case TeamType.BLUE:
+                this.blueTeam.splice(this.blueTeam.indexOf(self), 1)
+                break
+        }
+        self.game = {}
+        self.setGraphics(self.blueGraphics)
+        self.publish(Serialize.UpdateModeCount(this.blueTeam.length))
+    }
+
+    gameObject() {
+        return {
+            team: TeamType.BLUE,
+            spawnTime: 10,
+            tansu: null,
+            hp: 100,
+            caught: false,
+            judgment: false,
+            result: false,
+            vaccine: false,
+            count: 0
+        }
+    }
+
+    publishToRed(data) {
+        for (const red of this.redTeam) {
+            red.send(data)
+        }
+    }
+
+    publishToBlue(data) {
+        for (const blue of this.blueTeam) {
+            blue.send(data)
+        }
+    }
+
+    sameMapRedTeam(place) {
+        return this.redTeam.filter(red => red.place === place)
+    }
+
+    result(winner) {
+        this.state = STATE_RESULT
+        const slice = this.room.users.slice(0)
+        for (const user of slice) {
+            user.roomId = 0
+            user.game.result = true
+        }
+        Room.remove(this.room)
+        for (const red of this.redTeam)
+            red.score.sum += red.score.kill * 10 + red.score.killForWardrobe * 50
+        if (winner === TeamType.BLUE) {
+            for (const blue of this.blueTeam) {
+                if (blue.state === PlayerState.Tansu) {
+                    blue.score.sum += 800
+                    blue.score.surviveForWardrobe += 1
+                } else {
+                    blue.score.sum += 400
+                    blue.score.survive += 1
+                }
+            }
+        }
+        const ranks = slice.sort((a, b) => b.score.sum - a.score.sum)
+        const persons = slice.length
+        for (const red of this.redTeam) {
+            const mission = "킬 " + red.score.kill + "\n장농 킬 " + red.score.killForWardrobe
+            let exp = 100 + red.score.sum
+            let coin = 50 + parseInt(red.score.sum / 2)
+            if (exp < 100)
+                exp = 100
+            if (coin < 50)
+                coin = 50
+            const rank = ranks.indexOf(red) + 1
+            red.reward.exp = exp
+            red.reward.coin = coin
+            switch (rank) {
+                case 1:
+                    red.reward.point = 10
+                    break
+                case 2:
+                    red.reward.point = 5
+                    break
+                case 3:
+                    red.reward.point = 1
+                    break
+            }
+            red.send(Serialize.ResultGame(winner, rank, persons, mission, exp, coin))
+        }
+        for (const blue of this.blueTeam) {
+            const mission = "생존" + (blue.state === PlayerState.Tansu ? " (장농)" : "")
+            let exp = 100 + blue.score.sum
+            let coin = 50 + parseInt(blue.score.sum / 2)
+            if (exp < 100)
+                exp = 100
+            if (coin < 50)
+                coin = 50
+            const rank = ranks.indexOf(blue) + 1
+            blue.reward.exp = exp
+            blue.reward.coin = coin
+            switch (rank) {
+                case 1:
+                    blue.reward.point = 10
+                    break
+                case 2:
+                    blue.reward.point = 5
+                    break
+                case 3:
+                    blue.reward.point = 1
+                    break
+            }
+            blue.send(Serialize.ResultGame(winner, rank, persons, mission, exp, coin))
+        }
+    }
+
+    update() {
+        if (++this.tick % 10 === 0) {
+            this.tick = 0
+            switch (this.state) {
+                case STATE_READY:
+                    if (this.count <= 230 && this.count > 200) {
+                        if (this.count === 210)
+                            this.room.publish(Serialize.PlaySound('GhostsTen'))
+                        this.room.publish(Serialize.NoticeMessage(this.count - 200))
+                    } else if (this.count === 200) {
+                        this.room.lock = true
+                        this.state = STATE_GAME
+                        const lottos = pix.sample(this.blueTeam, this.blueTeam.length > 4 ? 2 : 1)
+                        for (const lotto of lottos) {
+                            this.blueTeam.splice(this.blueTeam.indexOf(lotto), 1)
+                            this.redTeam.push(lotto)
+                            this.moveToBase(lotto)
+                            lotto.game.team = TeamType.RED
+                            lotto.setGraphics(lotto.redGraphics)
+                            if (lotto.state === PlayerState.Tansu) {
+                                lotto.setState('Basic')
+                                lotto.send(Serialize.LeaveWardrobe())
+                                lotto.game.tansu.users.splice(lotto.game.tansu.users.indexOf(lotto), 1)
+                                lotto.game.tansu = null
+                            }
+                            lotto.send(Serialize.SetGameTeam(lotto))
+                            this.drawAkari(lotto)
+                        }
+                        this.change()
+                        this.publishToRed(Serialize.NoticeMessage('사물로 변신한 인간을 모두 색출하라.'))
+                        this.publishToRed(Serialize.PlaySound('A4'))
+                        this.publishToBlue(Serialize.NoticeMessage('사물로 변신하여 최대한 은닉하라.'))
+                        this.publishToBlue(Serialize.PlaySound('A4'))
+                        this.room.publish(Serialize.UpdateModeCount(this.blueTeam.length))
+                    }
+                    break
+                case STATE_GAME:
+                    if (this.count === 105) {
+                        this.room.publish(Serialize.InformMessage('<color=red>잠시 후 2차 변신이 시작됩니다...</color>'))
+                        this.room.publish(Serialize.PlaySound('Second'))
+                    } else if (this.count === 100) {
+                        this.change()
+                        this.room.publish(Serialize.PlaySound('A6'))
+                    }
+                    if (this.redTeam.length === 0)
+                        this.result(TeamType.BLUE)
+                    else if (this.blueTeam.length === 0)
+                        this.result(TeamType.RED)
+                    else if (this.count === 5)
+                        this.room.publish(Serialize.PlaySound('Second'))
+                    else if (this.count === 0)
+                        this.result(TeamType.BLUE)
+                    break
+            }
+            --this.count
+        }
+    }
+}

@@ -1,0 +1,49 @@
+{
+	"1": [
+		{
+			"name": "알바생 유즈하",
+			"place": 80,
+			"x": 6,
+			"y": 6,
+			"graphics": "Yuzuha",
+			"collider": false,
+			"action": {
+				"command": "mania",
+				"arguments": {
+					"fixed": true,
+					"message": [
+						"하이타이"
+					]
+				}
+			}
+		},
+		{
+			"name": "마니아",
+			"place": 79,
+			"x": 36,
+			"y": 24,
+			"graphics": "Mania",
+			"collider": false,
+			"action": {
+				"command": "mania",
+				"arguments": {
+					"fixed": false,
+					"message": [
+						"룰루랄라~"
+					]
+				}
+			}
+		},
+		{
+			"name": "",
+			"place": 79,
+			"x": 36,
+			"y": 26,
+			"graphics": "Ball",
+			"collider": true,
+			"action": {
+				"command": "obstacle"
+			}
+		}
+	]
+}
