@@ -2,7 +2,6 @@ const Serialize = require('./protocol/Serialize')
 const GameMap = require('./GameMap')
 const Place = require('./Place')
 const GameMode = require('./GameMode')
-const PlayGroundMode = require('./mode/PlayGroundMode')
 const { RoomType } = require('./util/const')
 
 global.Room = (function () {
@@ -88,9 +87,6 @@ global.Room = (function () {
             switch (this.type) {
                 case RoomType.GAME:
                     this.mode = new GameMode(this.index)
-                    break
-                case RoomType.PLAYGROUND:
-                    this.mode = new PlayGroundMode(this.index)
                     break
             }
         }
