@@ -11,7 +11,6 @@ my.UserData = function (user) {
     packet.clanname = user.clan && user.clan.name || ''
     packet.name = user.name
     packet.rank = user.rank
-    packet.sex = user.sex
     packet.level = user.level
     packet.exp = user.exp
     packet.maxExp = user.maxExp

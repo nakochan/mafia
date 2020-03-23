@@ -31,7 +31,6 @@ global.User = (function () {
             this.id = 0
             this.rank = 0
             this.name = '테스트'
-            this.sex = 1
             this.level = 1
             this.exp = 0
             this.maxExp = this.getMaxExp()
@@ -151,7 +150,6 @@ global.User = (function () {
             const rank = Data.rank.find(r => r.id === this.id)
             this.rank = rank ? rank.rank : 0
             this.name = user.name
-            this.sex = user.sex
             this.level = user.level
             this.exp = user.exp
             this.maxExp = this.getMaxExp()
