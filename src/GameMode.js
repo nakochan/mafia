@@ -1,9 +1,6 @@
 const Serialize = require('./protocol/Serialize')
 const RescueMode = require('./mode/RescueMode')
 const InfectMode = require('./mode/InfectMode')
-const HideMode = require('./mode/HideMode')
-const EscapeMode = require('./mode/EscapeMode')
-const DeathMatchMode = require('./mode/DeathMatchMode')
 
 module.exports = class GameMode {
     constructor(roomId) {
@@ -63,13 +60,7 @@ module.exports = class GameMode {
 
     update() {
         if (this.room.users.length >= 4) {
-            const modes = [
-                RescueMode,
-                InfectMode,
-                HideMode,
-                EscapeMode,
-
-            ]
+            const modes = [RescueMode]
             const i = Math.floor(Math.random() * modes.length)
             return this.room.changeMode(modes[i])
         } else {
