@@ -5,7 +5,6 @@ module.exports = class Event extends Character {
     constructor(roomId, {
         name,
         graphics,
-        hp,
         place,
         x,
         y,
@@ -14,7 +13,6 @@ module.exports = class Event extends Character {
     } = {
             name: '',
             graphics: '',
-            hp: 100,
             place: 0,
             x: 0,
             y: 0,
@@ -27,14 +25,11 @@ module.exports = class Event extends Character {
         this.roomId = roomId
         this.name = name
         this.graphics = graphics
-        this.hp = hp
         this.place = place
         this.x = x
         this.y = y
         this.collider = collider
         this.state = new Actions[action.command](action.arguments)
-        //if (action.command === '' || action.command === 'tansu') this.type = 3
-        // tpye 1: player, 2: event 3: event in underfoot
     }
 
     doAction(self) {
@@ -78,10 +73,6 @@ module.exports = class Event extends Character {
                 direction: this.direction
             }
         }
-    }
-
-    setUpHp(value) {
-        this.hp += value
     }
 
     turn(x, y) {

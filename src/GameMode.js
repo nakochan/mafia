@@ -1,6 +1,5 @@
 const Serialize = require('./protocol/Serialize')
-const RescueMode = require('./mode/RescueMode')
-const InfectMode = require('./mode/InfectMode')
+const MafiaMode = require('./mode/MafiaMode')
 
 module.exports = class GameMode {
     constructor(roomId) {
@@ -12,7 +11,6 @@ module.exports = class GameMode {
 
     moveToBase(self) {
         self.teleport(42, 9, 7)
-        this.drawAkari(self)
     }
 
     join(self) {
@@ -24,11 +22,6 @@ module.exports = class GameMode {
     leave(self) {
         self.game = {}
         self.setGraphics(self.pureGraphics)
-    }
-
-    drawAkari(self) {
-        // self.send(Serialize.SwitchLight(this.room.places[self.place].akari))
-        self.send(Serialize.SwitchLight(false))
     }
 
     drawEvents(self) {
@@ -51,7 +44,9 @@ module.exports = class GameMode {
         return true
     }
 
-    useItem(self) { }
+    useItem(self) {
+        return true
+    }
 
     doAction(self, event) {
         event.doAction(self)
@@ -59,8 +54,8 @@ module.exports = class GameMode {
     }
 
     update() {
-        if (this.room.users.length >= 300) {
-            const modes = [RescueMode]
+        if (this.room.users.length >= 4) {
+            const modes = [MafiaMode]
             const i = Math.floor(Math.random() * modes.length)
             return this.room.changeMode(modes[i])
         } else {

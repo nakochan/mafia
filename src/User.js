@@ -975,7 +975,7 @@ global.User = (function () {
             this.send(Serialize.LeaveWardrobe())
             let room = Room.available(type)
             if (!room)
-                room = Room.create(type)
+                room = Room.create(type, this.name + '의 방')
             room.join(this)
         }
 

@@ -1,7 +1,7 @@
 const Serialize = require('./protocol/Serialize')
 const GameMap = require('./GameMap')
-const Place = require('./Place')
 const GameMode = require('./GameMode')
+const Place = require('./Place')
 const { RoomType } = require('./util/const')
 
 global.Room = (function () {
@@ -32,8 +32,8 @@ global.Room = (function () {
             _static.empties = value
         }
 
-        static create(type = RoomType.PLAYGROUND) {
-            const room = new Room(type)
+        static create(type = RoomType.PLAYGROUND, name = '', max = 10) {
+            const room = new Room(type, name, max)
             Room.add(room)
             return room
         }
@@ -65,16 +65,17 @@ global.Room = (function () {
             return Room.rooms[id]
         }
 
-        constructor(type = RoomType.PLAYGROUND) {
+        constructor(type = RoomType.PLAYGROUND, name = '', max = 10) {
             this.index = 0
             this.type = type
+            this.name = name
             this.users = []
             this.places = new Proxy({}, {
                 get: (target, name) => {
                     return target.hasOwnProperty(name) ? target[name] : target[name] = new Place(this.index, name)
                 }
             })
-            this.max = 30
+            this.max = max
             this.mode = null
             this.loop = null
             this.isRunning = false
@@ -118,10 +119,6 @@ global.Room = (function () {
             this.mode = new mode(this.index)
             for (const user of this.users)
                 this.mode.join(user)
-        }
-
-        akari(place) {
-            return this.places[place].akari = !this.places[place].akari
         }
 
         publish(data) {
@@ -185,7 +182,7 @@ global.Room = (function () {
             for (const user of users) {
                 if (!(self.x === user.x && self.y === user.y || self.x + self.direction.x === user.x && self.y - self.direction.y === user.y))
                     continue
-                if (this.mode.attack(self, user))
+                if (this.mode.hit(self, user))
                     break
             }
             for (const event of events) {
@@ -205,7 +202,6 @@ global.Room = (function () {
         }
 
         draw(self) {
-            this.mode.drawAkari(self)
             this.mode.drawEvents(self)
             this.mode.drawUsers(self)
         }
@@ -214,6 +210,7 @@ global.Room = (function () {
             this.addUser(self)
             this.mode.join(self)
             this.publish(Serialize.UpdateRoomUserCount(this.users.length))
+            self.send(Serialize.GetRoomInfo(this))
         }
 
         leave(self) {

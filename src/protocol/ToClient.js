@@ -51,6 +51,7 @@ module.exports = {
         'DELETE_NOTICE_MESSAGE',
         'MESSAGE_GAME',
         'SET_ANIMATION',
-        'COMBO_MESSAGE'
+        'COMBO_MESSAGE',
+        'GET_ROOM_INFO'
     )
 }

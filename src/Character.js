@@ -12,7 +12,7 @@ module.exports = (function () {
             this.x = 0
             this.y = 0
             this.direction = { x: 0, y: -1 }
-            this.graphics = 'Mania'
+            this.graphics = 'KJT'
             this.dirty = true
         }
 

@@ -501,6 +501,16 @@ my.SetAnimation = function (obj, anim, sound = null) {
     return JSON.stringify(packet)
 }
 
+my.GetRoomInfo = function (room) {
+    const packet = {}
+    packet._head = ToClient.GET_ROOM_INFO
+    packet.index = room.index
+    packet.type = room.type
+    packet.name = room.name
+    packet.max = room.max
+    return JSON.stringify(packet)
+}
+
 module.exports = {
     ...my
 }

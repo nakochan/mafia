@@ -1,6 +1,15 @@
 const TeamType = {
-    RED: 0,
-    BLUE: 1
+    DEFAULT: 0,
+    MAFIA: 1,
+    CITIZEN: 2
+}
+
+const JobType = {
+    DEFAULT: 0,
+    MAFIA: 1,
+    CITIZEN: 2,
+    POLICE: 3,
+    DOCTOR: 4
 }
 
 const RoomType = {
@@ -9,31 +18,16 @@ const RoomType = {
 }
 
 const MapType = {
-    ASYLUM: 1,
-    TATAMI: 2,
-    GON: 3,
-    LABORATORY: 4,
-    SCHOOL: 5,
-    MINE: 6,
-    ISLAND: 7,
-    MANSION: 8,
-    DESERT: 9
+    TOWN: 1
 }
 
 const ModeType = {
-    RESCUE: 1,
-    INFECT: 2,
-    HIDE: 3,
-    ESCAPE: 4,
-    DEATH_MATCH: 5,
-    PROTECT: 6,
-    BLAST: 7,
-    TOUCH_DOWN: 8,
-    DEFENSE: 9
+    MAFIA: 1
 }
 
 module.exports = {
     TeamType,
+    JobType,
     RoomType,
     MapType,
     ModeType
