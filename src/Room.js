@@ -105,7 +105,13 @@ global.Room = (function () {
 
         addUser(user) {
             user.roomId = this.index
-            this.users.unshift(user)
+            for (let i = 0; i < this.max; ++i) {
+                if (!this.users[i]) {
+                    this.users[i] = user
+                    break
+                }
+            }
+            //this.users.push(user)
             console.log(this.users.length + ' add and now')
             user.roomUserIndex = this.users.indexOf(user) + 1
             console.log(this.users.indexOf(user) + " < index: " + user.id + " id entered")
