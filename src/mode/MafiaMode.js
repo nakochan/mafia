@@ -30,11 +30,11 @@ module.exports = class RescueMode {
         this.jobs = []
         this.target = null
         this.room = Room.get(this.roomId)
-        const objects = require('../../Assets/Mods/Mod' + ('' + this.mode).padStart(3, '0') + '.json')[this.map]
+        /*const objects = require('../../Assets/Mods/Mod' + ('' + this.mode).padStart(3, '0') + '.json')[this.map]
         for (const object of objects) {
             const event = new Event(this.roomId, object)
             this.room.addEvent(event)
-        }
+        }*/
     }
 
     getJSON() {
@@ -189,22 +189,26 @@ module.exports = class RescueMode {
                 user.game.job = JobType.CITIZEN
             user.send(Serialize.SetGameTeam(user))
             user.send(Serialize.UpdateModeInfo(user.game.job))
+            console.log(user.game.job + " / " + user.name)
             this.moveToDay(user)
         }
         this.day()
     }
 
     day() {
+        this.count = 180
         this.state = STATE_DAY
         for (const user of this.onlyLivingUser())
             user.game.count = 0
         ++this.days
         // n번째 날이 밝았습니다.
+        console.log(this.days + "날 밝음")
         if (this.days >= 2)
             this.check()
     }
 
     suspect() {
+        this.count = 10
         const targets = this.onlyLivingUser().slice(0).sort((a, b) => b.game.count - a.game.count)
         const target = targets[0]
         if (target.game.count < 1)
@@ -217,10 +221,12 @@ module.exports = class RescueMode {
     }
 
     deathPenalty() {
+        this.count = 10
         this.state = STATE_DEATH_PENALTY
     }
 
     vote() {
+        this.count = 10
         this.state = STATE_VOTE
         if (this.target === null)
             return this.night()
@@ -234,13 +240,14 @@ module.exports = class RescueMode {
     }
 
     night() {
+        this.count = 180
         this.state = STATE_NIGHT
         for (const user of this.room.users)
             this.moveToNight(user)
     }
 
     check() {
-
+        this.count = 10
     }
 
     result(winner) {
