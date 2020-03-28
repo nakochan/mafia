@@ -189,6 +189,7 @@ my.ModeData = function (mode) {
     packet.mode = mode.mode
     packet.count = mode.count
     packet.maxCount = mode.maxCount
+    console.log(packet)
     return JSON.stringify(packet)
 }
 
