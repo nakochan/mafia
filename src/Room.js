@@ -106,22 +106,18 @@ global.Room = (function () {
         addUser(user) {
             user.roomId = this.index
             for (let i = 0; i < this.max; ++i) {
-                if (!this.users[i]) {
+                if (this.users[i] == null) {
                     this.users[i] = user
+                    user.roomUserIndex = i + 1
                     break
                 }
             }
             //this.users.push(user)
-            console.log(this.users.length + ' add and now')
-            user.roomUserIndex = this.users.indexOf(user) + 1
-            console.log(this.users.indexOf(user) + " < index: " + user.id + " id entered")
             this.places[user.place].addUser(user)
         }
 
         removeUser(user) {
-            console.log(this.users.indexOf(user) + " < index: " + user.id + " id exited")
             this.users.splice(this.users.indexOf(user), 1)
-            console.log(this.users.length + ' remove and now')
             this.places[user.place].removeUser(user)
             user.roomId = 0
         }
