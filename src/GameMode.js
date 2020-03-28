@@ -15,7 +15,6 @@ module.exports = class GameMode {
     }
 
     join(self) {
-        self.roomUserIndex = this.room.users.indexOf(self) + 1
         self.game = {}
         self.setGraphics(self.pureGraphics)
         this.moveToBase(self)

@@ -105,7 +105,7 @@ global.Room = (function () {
 
         addUser(user) {
             user.roomId = this.index
-            for (let i = 0; i < this.max; ++i) {
+            for (let i = 0; i < this.max; i++) {
                 if (this.users[i] == null) {
                     this.users[i] = user
                     user.roomUserIndex = i + 1
