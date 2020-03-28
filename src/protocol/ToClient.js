@@ -15,7 +15,7 @@ module.exports = {
         'SET_GRAPHICS',
         'PLAY_SOUND',
         'UPDATE_ROOM_USER_COUNT',
-        'UPDATE_MODE_COUNT',
+        'UPDATE_MODE_INFO',
         'UPDATE_GAME_ITEM',
         'REMOVE_GAME_ITEM',
         'SET_GAME_TEAM',
