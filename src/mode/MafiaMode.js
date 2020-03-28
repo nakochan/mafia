@@ -177,7 +177,8 @@ module.exports = class RescueMode {
         this.init()
         for (const user of this.room.users) {
             if (this.jobs.length > 0) {
-                const job = pix.sample(this.jobs, 1)
+                const rand = Math.floor(Math.random() * this.jobs.length)
+                const job = this.jobs[rand]
                 console.log("----------------")
                 console.log("job: " + job)
                 console.log(this.jobs.length)
