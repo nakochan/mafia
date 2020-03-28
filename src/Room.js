@@ -133,7 +133,8 @@ global.Room = (function () {
         }
 
         removeUser(user) {
-            this.picks[user.index] = null
+            this.picks[user.roomUserIndex - 1] = null
+            delete this.picks[user.roomUserIndex - 1]
             this.users.splice(this.users.indexOf(user), 1)
             this.places[user.place].removeUser(user)
             user.roomId = 0
