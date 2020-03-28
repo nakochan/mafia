@@ -172,7 +172,7 @@ module.exports = class RescueMode {
     }
 
     ready() {
-        this.room.lock = true
+        // this.room.lock = true
         this.room.publish(Serialize.PlaySound(2, 'GhostsTen'))
         this.init()
         for (const user of this.room.users) {
