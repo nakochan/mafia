@@ -149,11 +149,6 @@ my.UpdateModeInfo = function (index) {
     const packet = {}
     packet._head = ToClient.UPDATE_MODE_INFO
     packet.index = parseInt(index)
-
-    console.log("-------------")
-    console.log(index)
-    console.log("-------------")
-
     return JSON.stringify(packet)
 }
 

@@ -65,8 +65,8 @@ module.exports = class RescueMode {
         self.setGraphics(self.pureGraphics)
         this.citizenTeam.push(self)
         this.moveToDay(self)
-        self.send(Serialize.NoticeMessage('감옥에 갇힌 인질을 전원 구출하라.'))
         self.publishToMap(Serialize.SetGameTeam(self))
+        self.send(Serialize.UpdateModeInfo(self.game.job))
         self.publish(Serialize.ModeData(this))
     }
 
@@ -178,7 +178,12 @@ module.exports = class RescueMode {
         for (const user of this.room.users) {
             if (this.jobs.length > 0) {
                 const job = pix.sample(this.jobs, 1)
+                console.log("----------------")
+                console.log("job: " + job)
+                console.log(this.jobs.length)
                 this.jobs.splice(this.jobs.indexOf(job), 1)
+                console.log(this.jobs.length)
+                console.log("----------------")
                 if (job === JobType.MAFIA) {
                     this.citizenTeam.splice(this.citizenTeam.indexOf(user), 1)
                     this.mafiaTeam.push(user)
@@ -201,8 +206,7 @@ module.exports = class RescueMode {
         for (const user of this.onlyLivingUser())
             user.game.count = 0
         ++this.days
-        // n번째 날이 밝았습니다.
-        console.log(this.days + "날 밝음")
+        this.room.publish(Serialize.NoticeMessage(this.days + '째날 아침이 밝았습니다...'))
         if (this.days >= 2)
             this.check()
     }
