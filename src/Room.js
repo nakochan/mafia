@@ -110,34 +110,22 @@ global.Room = (function () {
         addUser(user) {
             user.roomId = this.index
             for (let i = 0; i < this.max; i++) {
-                if (this.users[i] == null) {
-                    this.users[i] = user
-                    break
-                }
-            }
-
-            console.log("=================")
-            console.log(this.picks)
-            for (let i = 0; i < this.max; i++) {
                 if (this.picks[i] == null) {
                     this.picks[i] = user.index
-                    user.roomUserIndex = i + 1
+                    user.pick = i + 1
                     break
                 }
             }
-            console.log(this.picks)
-            console.log("=================")
-
-            //this.users.push(user)
+            this.users.push(user)
             this.places[user.place].addUser(user)
         }
 
         removeUser(user) {
-            this.picks[user.roomUserIndex - 1] = null
-            delete this.picks[user.roomUserIndex - 1]
+            user.roomId = 0
+            this.picks[user.pick - 1] = null
+            delete this.picks[user.pick - 1]
             this.users.splice(this.users.indexOf(user), 1)
             this.places[user.place].removeUser(user)
-            user.roomId = 0
         }
 
         changeMode(mode) {
@@ -235,7 +223,7 @@ global.Room = (function () {
             this.addUser(self)
             this.mode.join(self)
             this.publish(Serialize.UpdateRoomUserCount(this.users.length))
-            self.send(Serialize.GetRoomInfo(this, self.roomUserIndex))
+            self.send(Serialize.GetRoomInfo(this, self.pick))
         }
 
         leave(self) {

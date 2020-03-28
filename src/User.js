@@ -20,7 +20,7 @@ global.User = (function () {
             super()
             this.type = 1
             this.index = 0
-            this.roomUserIndex = 0
+            this.pick = 0
             this.socket = socket
             this.verify = verify
             this.roomId = 0

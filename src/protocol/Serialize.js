@@ -107,7 +107,7 @@ my.CreateGameObject = function (obj, hide = false) {
     const packet = {}
     packet._head = ToClient.CREATE_GAME_OBJECT
     packet.index = obj.index
-    packet.roomUserIndex = obj.roomUserIndex || 0
+    packet.pick = obj.pick || 0
     packet.clanname = hide ? '' : (obj.clan && obj.clan.name || '')
     packet.type = obj.type
     packet.name = hide ? '' : obj.name
@@ -503,11 +503,11 @@ my.SetAnimation = function (obj, anim, sound = null) {
     return JSON.stringify(packet)
 }
 
-my.GetRoomInfo = function (room, roomUserIndex = 0) {
+my.GetRoomInfo = function (room, pick = 0) {
     const packet = {}
     packet._head = ToClient.GET_ROOM_INFO
     packet.index = room.index
-    packet.roomUserIndex = roomUserIndex
+    packet.pick = pick
     packet.type = room.type
     packet.name = room.name
     packet.max = room.max
