@@ -176,7 +176,7 @@ module.exports = class RescueMode {
         this.room.publish(Serialize.PlaySound(2, 'GhostsTen'))
         this.init()
         for (const user of this.room.users) {
-            if (this.jobs > 0) {
+            if (this.jobs.length > 0) {
                 const job = pix.sample(this.jobs, 1)
                 this.jobs.splice(this.jobs.indexOf(job), 1)
                 if (job === JobType.MAFIA) {

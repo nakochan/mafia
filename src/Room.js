@@ -106,10 +106,12 @@ global.Room = (function () {
         addUser(user) {
             user.roomId = this.index
             this.users.push(user)
+            console.log(this.users.indexOf(user) + "< 인덱스: " + user.id + "번 유저 들어옴")
             this.places[user.place].addUser(user)
         }
 
         removeUser(user) {
+            console.log(this.users.indexOf(user) + "< 인덱스: " + user.id + "번 유저 나감")
             this.users.splice(this.users.indexOf(user), 1)
             this.places[user.place].removeUser(user)
             user.roomId = 0
