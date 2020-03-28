@@ -106,6 +106,7 @@ global.Room = (function () {
         addUser(user) {
             user.roomId = this.index
             this.users.push(user)
+            user.roomUserIndex = this.users.indexOf(user) + 1
             console.log(this.users.indexOf(user) + " < index: " + user.id + " id entered")
             this.places[user.place].addUser(user)
         }
@@ -212,7 +213,6 @@ global.Room = (function () {
             this.addUser(self)
             this.mode.join(self)
             this.publish(Serialize.UpdateRoomUserCount(this.users.length))
-            self.roomUserIndex = this.users.indexOf(self) + 1
             self.send(Serialize.GetRoomInfo(this, self.roomUserIndex))
         }
 

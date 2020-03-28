@@ -186,7 +186,7 @@ my.SetGameTeam = function (obj) {
 my.ModeData = function (mode) {
     const packet = {}
     packet._head = ToClient.MODE_DATA
-    packet.type = mode.type
+    packet.mode = mode.mode
     packet.count = mode.count
     packet.maxCount = mode.maxCount
     return JSON.stringify(packet)
