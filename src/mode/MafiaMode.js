@@ -40,7 +40,7 @@ module.exports = class RescueMode {
     getJSON() {
         return {
             map: this.map,
-            mode: this.type,
+            mode: this.mode,
             count: this.count,
             maxCount: this.maxCount,
             persons: this.citizenTeam.length
