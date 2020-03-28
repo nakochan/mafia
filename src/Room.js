@@ -120,7 +120,7 @@ global.Room = (function () {
             console.log(this.picks)
             for (let i = 0; i < this.max; i++) {
                 if (this.picks[i] == null) {
-                    this.picks[i] = user.name
+                    this.picks[i] = user.index
                     user.roomUserIndex = i + 1
                     break
                 }
@@ -133,7 +133,7 @@ global.Room = (function () {
         }
 
         removeUser(user) {
-            this.picks.splice(this.picks.indexOf(user.name), 1)
+            delete this.picks[user.index]
             this.users.splice(this.users.indexOf(user), 1)
             this.places[user.place].removeUser(user)
             user.roomId = 0
