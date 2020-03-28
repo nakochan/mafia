@@ -70,6 +70,10 @@ global.Room = (function () {
             this.type = type
             this.name = name
             this.users = []
+
+
+            this.picks = []
+
             this.places = new Proxy({}, {
                 get: (target, name) => {
                     return target.hasOwnProperty(name) ? target[name] : target[name] = new Place(this.index, name)
@@ -108,15 +112,28 @@ global.Room = (function () {
             for (let i = 0; i < this.max; i++) {
                 if (this.users[i] == null) {
                     this.users[i] = user
+                    break
+                }
+            }
+
+            console.log("=================")
+            console.log(this.picks)
+            for (let i = 0; i < this.max; i++) {
+                if (this.picks[i] == null) {
+                    this.picks[i] = user.name
                     user.roomUserIndex = i + 1
                     break
                 }
             }
+            console.log(this.picks)
+            console.log("=================")
+
             //this.users.push(user)
             this.places[user.place].addUser(user)
         }
 
         removeUser(user) {
+            this.picks.splice(this.picks.indexOf(user.name), 1)
             this.users.splice(this.users.indexOf(user), 1)
             this.places[user.place].removeUser(user)
             user.roomId = 0
