@@ -85,15 +85,18 @@ module.exports = class RescueMode {
     }
 
     moveToDay(self) {
-        self.teleport(42, 9, 7)
+        self.teleport(1, 24, 14)
+        self.send(Serialize.PlaySound(1, 'hospital'))
     }
 
     moveToNight(self) {
-        self.teleport(42, 9, 7)
+        self.teleport(2, 24, 14)
+        self.send(Serialize.PlaySound(1, 'n14'))
     }
 
     moveToHouse(self) {
         self.teleport(42, 9, 7)
+        self.send(Serialize.PlaySound(1, 'n14'))
     }
 
     drawEvents(self) {
@@ -170,7 +173,7 @@ module.exports = class RescueMode {
 
     ready() {
         this.room.lock = true
-        this.room.publish(Serialize.PlaySound('GhostsTen'))
+        this.room.publish(Serialize.PlaySound(2, 'GhostsTen'))
         this.init()
         for (const user of this.room.users) {
             if (this.jobs > 0) {
@@ -185,6 +188,7 @@ module.exports = class RescueMode {
             } else
                 user.game.job = JobType.CITIZEN
             user.send(Serialize.SetGameTeam(user))
+            user.send(Serialize.UpdateModeInfo(user.game.job))
             this.moveToDay(user)
         }
         this.day()

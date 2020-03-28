@@ -167,7 +167,7 @@ global.Room = (function () {
                 return
             this.teleport(self, portal.nextPlace, portal.nextX, portal.nextY, portal.nextDirX, portal.nextDirY)
             if (portal.sound)
-                this.publishToMap(self.place, Serialize.PlaySound(portal.sound))
+                this.publishToMap(self.place, Serialize.PlaySound(2, portal.sound))
         }
 
         teleport(self, place, x, y, dx = 0, dy = 0) {
@@ -210,7 +210,8 @@ global.Room = (function () {
             this.addUser(self)
             this.mode.join(self)
             this.publish(Serialize.UpdateRoomUserCount(this.users.length))
-            self.send(Serialize.GetRoomInfo(this))
+            self.roomUserIndex = this.users.indexOf(self) + 1
+            self.send(Serialize.GetRoomInfo(this, self.roomUserIndex))
         }
 
         leave(self) {

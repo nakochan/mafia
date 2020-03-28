@@ -107,6 +107,7 @@ my.CreateGameObject = function (obj, hide = false) {
     const packet = {}
     packet._head = ToClient.CREATE_GAME_OBJECT
     packet.index = obj.index
+    packet.roomUserIndex = obj.roomUserIndex || 0
     packet.clanname = hide ? '' : (obj.clan && obj.clan.name || '')
     packet.type = obj.type
     packet.name = hide ? '' : obj.name
@@ -129,9 +130,10 @@ my.SetGraphics = function (obj) {
     return JSON.stringify(packet)
 }
 
-my.PlaySound = function (name) {
+my.PlaySound = function (type, name) {
     const packet = {}
     packet._head = ToClient.PLAY_SOUND
+    packet.type = type
     packet.name = name
     return JSON.stringify(packet)
 }
@@ -143,10 +145,10 @@ my.UpdateRoomUserCount = function (count) {
     return JSON.stringify(packet)
 }
 
-my.UpdateModeCount = function (count) {
+my.UpdateModeInfo = function (index) {
     const packet = {}
-    packet._head = ToClient.UPDATE_MODE_COUNT
-    packet.count = count
+    packet._head = ToClient.UPDATE_MODE_INFO
+    packet.index = index
     return JSON.stringify(packet)
 }
 
@@ -501,10 +503,11 @@ my.SetAnimation = function (obj, anim, sound = null) {
     return JSON.stringify(packet)
 }
 
-my.GetRoomInfo = function (room) {
+my.GetRoomInfo = function (room, roomUserIndex = 0) {
     const packet = {}
     packet._head = ToClient.GET_ROOM_INFO
     packet.index = room.index
+    packet.roomUserIndex = roomUserIndex
     packet.type = room.type
     packet.name = room.name
     packet.max = room.max

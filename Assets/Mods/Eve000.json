@@ -37,44 +37,5 @@
 				"command": "obstacle"
 			}
 		}
-	],
-	"4": [
-		{
-			"name": "",
-			"place": 0,
-			"x": 0,
-			"y": 0,
-			"graphics": "key",
-			"collider": false,
-			"action": {
-				"command": "key"
-			}
-		}
-	],
-	"5": [
-		{
-			"name": "탈출구",
-			"place": 0,
-			"x": 0,
-			"y": 0,
-			"graphics": "door-Blackwood_panel",
-			"collider": false,
-			"action": {
-				"command": "escape"
-			}
-		}
-	],
-	"6": [
-		{
-			"name": "",
-			"place": 0,
-			"x": 0,
-			"y": 0,
-			"graphics": "ao",
-			"collider": false,
-			"action": {
-				"command": "oni"
-			}
-		}
 	]
 }

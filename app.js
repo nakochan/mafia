@@ -21,7 +21,7 @@ const lex = require('greenlock-koa').create({
     configDir: require('os').homedir() + '/acme/etc',
     renewWithin: 81 * 24 * 60 * 60 * 1000,
     renewBy: 80 * 24 * 60 * 60 * 1000,
-    store: require('greenlock-store-fs')
+    //store: require('greenlock-store-fs')
 })
 const http = require('http')
 const https = require('https')

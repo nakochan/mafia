@@ -31,7 +31,7 @@ class FireMethod {
                             red.send(Serialize.InformMessage('<color=red>사망했습니다.</color>'))
                             self.send(Serialize.InformMessage('<color=red>' + red.name + ' 소탕 완료!</color>'))
                             self.publish(Serialize.NoticeMessage(red.name + (pix.maker(red.name) ? '가' : '이') + ' 소탕되다.'))
-                            self.publish(Serialize.PlaySound('A3'))
+                            self.publish(Serialize.PlaySound(2, 'A3'))
                             self.publish(Serialize.UpdateModeRedAndBlue(room.mode.score.red, room.mode.score.blue))
                         } else {
                             red.game.hp -= (parseInt(Math.random() * 20) + 80) - ((range - 1) * 80)
@@ -53,7 +53,7 @@ class FireMethod {
                         ++room.mode.score.blue
                         ++self.game.kill
                         self.send(Serialize.InformMessage('<color=red>' + event.name + ' 소탕 완료!</color>'))
-                        self.publish(Serialize.PlaySound('A3'))
+                        self.publish(Serialize.PlaySound(2, 'A3'))
                         self.publishToMap(Serialize.RemoveGameObject(event))
                         room.removeEvent(event)
                     } else {

@@ -10,10 +10,12 @@ module.exports = class GameMode {
     }
 
     moveToBase(self) {
-        self.teleport(42, 9, 7)
+        self.teleport(2, 24, 14)
+        self.send(Serialize.PlaySound(1, 'hospital'))
     }
 
     join(self) {
+        self.roomUserIndex = this.room.users.indexOf(self) + 1
         self.game = {}
         self.setGraphics(self.pureGraphics)
         this.moveToBase(self)

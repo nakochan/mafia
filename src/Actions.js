@@ -28,21 +28,21 @@ class DoorState {
         if (this.isAlive) {
             if (this.isOpen) {
                 if (self.game.team === TeamType.RED) return
-                self.publishToMap(Serialize.PlaySound(this.closeSound))
+                self.publishToMap(Serialize.PlaySound(2, this.closeSound))
                 door.move(-1, 0)
                 this.isOpen = false
             } else {
                 const max = self.game.team === TeamType.RED ? 10 : 0
                 let r = parseInt(Math.random() * max)
                 if (r === 0) {
-                    self.publishToMap(Serialize.PlaySound(this.openSound))
+                    self.publishToMap(Serialize.PlaySound(2, this.openSound))
                     door.move(1, 0)
                     this.isOpen = true
                     if (self.game.team === TeamType.RED) {
                         r = parseInt(Math.random() * 10)
                         if (r === 0) this.isAlive = false
                     }
-                } else self.publishToMap(Serialize.PlaySound(this.knockSound))
+                } else self.publishToMap(Serialize.PlaySound(2, this.knockSound))
             }
         } else self.send(Serialize.InformMessage('<color=red>오니가 철창문을 고장냈다.</color>'))
     }
