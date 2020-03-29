@@ -308,7 +308,7 @@ module.exports = class RescueMode {
     suspect() {
         console.log("suspect")
         for (const user of this.onlyLivingUser())
-            user.send.publish(Serialize.CloseVote())
+            user.send(Serialize.CloseVote())
         const targets = this.onlyLivingUser().slice(0).sort((a, b) => b.game.count - a.game.count)
         if (targets.length < 1)
             return this.night()
