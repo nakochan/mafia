@@ -329,7 +329,6 @@ module.exports = class RescueMode {
         if (targets.length < 1)
             return this.night()
         const target = targets[0]
-        console.log(target)
         if (target.game.count < 1)
             return this.night()
         const checkSameVotes = targets.filter(user => user.game.count === target.game.count)
@@ -397,6 +396,9 @@ module.exports = class RescueMode {
         let target = null
         const mafia = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA)
         if (mafia) {
+            console.log(mafia.name)
+            console.log(mafia.game.target)
+            console.log(mafia.game.target.name)
             if (mafia.game.target !== null)
                 target = mafia.game.target
         }
