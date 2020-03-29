@@ -311,7 +311,7 @@ module.exports = class RescueMode {
     lastDitch() {
         console.log("lastDitch")
         this.count = 10
-        this.state = STATE_DEATH_PENALTY
+        this.state = STATE_LAST_DITCH
         for (const user of this.room.users) {
             if (this.target === user)
                 user.teleport(13, 10, 7)
