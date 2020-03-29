@@ -102,6 +102,8 @@ module.exports = class RescueMode {
                 this.citizenTeam.splice(this.citizenTeam.indexOf(self), 1)
                 break
         }
+        if (this.state !== STATE_READY && this.mafiaTeam.length < 1)
+            this.result(TeamType.CITIZEN)
         self.game = {}
         self.setGraphics(self.pureGraphics)
         const { events } = this.room.places[2]
@@ -208,6 +210,8 @@ module.exports = class RescueMode {
     }
 
     hit(self, target) {
+        if (self === target)
+            return false
         if (self.game.target || self.game.dead || target.game.dead)
             return false
         else if (self.game.JobType === JobType.DEFAULT || self.game.JobType === JobType.CITIZEN || target.game.JobType === JobType.MAFIA)
