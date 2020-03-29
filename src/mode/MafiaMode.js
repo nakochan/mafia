@@ -300,14 +300,14 @@ module.exports = class RescueMode {
         console.log("checkday")
         this.count = 10
         this.state = STATE_SUSPECT
-        for (const user of onlyLivingUser())
+        for (const user of this.onlyLivingUser())
             user.send(Serialize.GetVote(this.onlyLivingUser()))
         this.room.publish(Serialize.ModeData(this))
     }
 
     suspect() {
         console.log("suspect")
-        for (const user of onlyLivingUser())
+        for (const user of this.onlyLivingUser())
             user.send.publish(Serialize.CloseVote())
         const targets = this.onlyLivingUser().slice(0).sort((a, b) => b.game.count - a.game.count)
         if (targets.length < 1)
