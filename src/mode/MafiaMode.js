@@ -298,7 +298,10 @@ module.exports = class RescueMode {
         console.log("suspect")
         this.room.publish(Serialize.CloseVote())
         const targets = this.onlyLivingUser().slice(0).sort((a, b) => b.game.count - a.game.count)
+        if (targets.length < 1)
+            return this.night()
         const target = targets[0]
+        console.log(target)
         if (target.game.count < 1)
             return this.night()
         const checkSameVotes = targets.filter(user => user.game.count === target.game.count)
@@ -326,7 +329,7 @@ module.exports = class RescueMode {
         this.state = STATE_VOTE
         if (this.target === null)
             return this.night()
-        let dieCount = this.onlyLivingUser().filter(user => user.x >= 10).length
+        let dieCount = this.onlyLivingUser().filter(user => user.x <= 10).length
         let saveCount = this.onlyLivingUser().length - dieCount
         if (dieCount > saveCount) {
             this.target.game.dead = true
@@ -338,7 +341,14 @@ module.exports = class RescueMode {
 
     deathPenalty() {
         console.log("death")
-        this.night()
+        this.count = 5
+        this.state = STATE_DEATH_PENALTY
+        const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
+        const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
+        if (mafiaTeam >= citizenTeam)
+            return this.result(TeamType.MAFIA)
+        else if (mafiaTeam < 1)
+            return this.result(TeamType.CITIZEN)
     }
 
     night() {
@@ -352,12 +362,72 @@ module.exports = class RescueMode {
 
     checkNight() {
         console.log("checkNight")
+
         this.day()
     }
 
     result(winner) {
         this.state = STATE_RESULT
-
+        const slice = this.room.users.slice(0)
+        for (const user of slice) {
+            user.roomId = 0
+            user.game.result = true
+        }
+        Room.remove(this.room)
+        for (const red of this.mafiaTeam)
+            red.score.sum += 100
+        for (const blue of this.citizenTeam)
+            blue.score.sum += 100
+        const ranks = slice.sort((a, b) => b.score.sum - a.score.sum)
+        const persons = slice.length
+        for (const red of this.mafiaTeam) {
+            const mission = "킬 " + red.score.kill + "\n장농 킬 " + red.score.killForWardrobe
+            let exp = 100 + red.score.sum
+            let coin = 50 + parseInt(red.score.sum / 2)
+            if (exp < 100)
+                exp = 100
+            if (coin < 50)
+                coin = 50
+            const rank = ranks.indexOf(red) + 1
+            red.reward.exp = exp
+            red.reward.coin = coin
+            switch (rank) {
+                case 1:
+                    red.reward.point = 10
+                    break
+                case 2:
+                    red.reward.point = 5
+                    break
+                case 3:
+                    red.reward.point = 1
+                    break
+            }
+            red.send(Serialize.ResultGame(winner, rank, persons, mission, exp, coin))
+        }
+        for (const blue of this.citizenTeam) {
+            const mission = "구출 " + blue.score.rescue + " (" + blue.score.rescueCombo + "콤보)\n수감 " + (blue.score.death + blue.score.deathForWardrobe)
+            let exp = 100 + blue.score.sum
+            let coin = 50 + parseInt(blue.score.sum / 2)
+            if (exp < 100)
+                exp = 100
+            if (coin < 50)
+                coin = 50
+            const rank = ranks.indexOf(blue) + 1
+            blue.reward.exp = exp
+            blue.reward.coin = coin
+            switch (rank) {
+                case 1:
+                    blue.reward.point = 10
+                    break
+                case 2:
+                    blue.reward.point = 5
+                    break
+                case 3:
+                    blue.reward.point = 1
+                    break
+            }
+            blue.send(Serialize.ResultGame(winner, rank, persons, mission, exp, coin))
+        }
     }
 
     update() {
@@ -386,7 +456,8 @@ module.exports = class RescueMode {
                         this.vote()
                     break
                 case STATE_DEATH_PENALTY:
-
+                    if (this.count === 0)
+                        this.night()
                     break
             }
             --this.count
