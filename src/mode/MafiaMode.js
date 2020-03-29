@@ -79,7 +79,10 @@ module.exports = class RescueMode {
             "y": y[self.pick - 1],
             "graphics": "Sign",
             "owner": self.index,
-            "collider": true
+            "collider": true,
+            "action": {
+                "command": ""
+            }
         })
         this.room.addEvent(sign)
         this.moveToDay(self)
