@@ -314,9 +314,9 @@ module.exports = class RescueMode {
         this.state = STATE_DEATH_PENALTY
         for (const user of this.room.users) {
             if (this.target === user)
-                self.teleport(13, 10, 7)
+                user.teleport(13, 10, 7)
             else
-                self.teleport(13, 10, 13)
+                user.teleport(13, 10, 13)
         }
         this.room.publish(Serialize.ModeData(this))
     }
