@@ -55,13 +55,13 @@ module.exports = class GameMode {
     }
 
     update() {
-        if (this.room.users.length >= 3) {
+        if (this.room.users.length >= 4) {
             const modes = [MafiaMode]
             const i = Math.floor(Math.random() * modes.length)
             return this.room.changeMode(modes[i])
         } else {
             if (this.count % 100 === 0)
-                this.room.publish(Serialize.NoticeMessage('3명부터 시작합니다. (' + this.room.users.length + '/' + this.room.max + '명)'))
+                this.room.publish(Serialize.NoticeMessage('4명부터 시작합니다. (' + this.room.users.length + '/' + this.room.max + '명)'))
         }
         if (++this.count === 10000)
             this.count = 0
