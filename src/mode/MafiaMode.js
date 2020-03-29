@@ -102,7 +102,7 @@ module.exports = class RescueMode {
         }
         self.game = {}
         self.setGraphics(self.pureGraphics)
-        const { events } = room.places[2]
+        const { events } = this.room.places[2]
         const event = events.filter(e => e.owner === self.index)
         if (event)
             this.room.removeEvent(event)
@@ -112,7 +112,6 @@ module.exports = class RescueMode {
     moveToDay(self) {
         self.teleport(1, 24, 14)
         self.send(Serialize.SwitchLight(false))
-        self.send(Serialize.NoticeMessage(this.days + '째날 아침이 밝았습니다...'))
         self.send(Serialize.PlaySound(1, 'hospital'))
     }
 
@@ -277,9 +276,11 @@ module.exports = class RescueMode {
         for (const user of this.room.users) {
             user.game.count = 0
             user.game.vote = null
+            user.send(Serialize.NoticeMessage(this.days + '째날 아침이 밝았습니다...'))
             this.moveToDay(user)
         }
         this.room.publish(Serialize.PlaySound(2, 'GhostsTen'))
+        this.room.publish(Serialize.ModeData(this))
     }
 
     checkDay() {
@@ -288,6 +289,7 @@ module.exports = class RescueMode {
         this.count = 10
         this.state = STATE_SUSPECT
         this.room.publish(Serialize.GetVote(this.onlyLivingUser()))
+        this.room.publish(Serialize.ModeData(this))
     }
 
     suspect() {
@@ -312,10 +314,10 @@ module.exports = class RescueMode {
             else
                 self.teleport(13, 10, 13)
         }
+        this.room.publish(Serialize.ModeData(this))
     }
 
     vote() {
-        this.count = 10
         this.state = STATE_VOTE
         if (this.target === null)
             return this.night()
@@ -338,6 +340,7 @@ module.exports = class RescueMode {
         this.state = STATE_NIGHT
         for (const user of this.room.users)
             this.moveToNight(user)
+        this.room.publish(Serialize.ModeData(this))
     }
 
     checkNight() {
