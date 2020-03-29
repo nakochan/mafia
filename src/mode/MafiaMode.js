@@ -308,7 +308,7 @@ module.exports = class RescueMode {
             user.send(Serialize.NoticeMessage(this.days + '째날 아침이 밝았습니다...'))
             this.moveToDay(user)
         }
-        this.room.publish(Serialize.PlaySound(2, 'GhostsTen'))
+        // this.room.publish(Serialize.PlaySound(2, 'GhostsTen'))
         this.room.publish(Serialize.ModeData(this))
     }
 
