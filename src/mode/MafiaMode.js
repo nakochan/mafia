@@ -403,8 +403,6 @@ module.exports = class RescueMode {
             const mafia = mafias[0]
             if (mafia) {
                 console.log(mafia.name)
-                console.log(mafia.game.target)
-                console.log(mafia.game.target.name)
                 if (mafia.game.target)
                     target = mafia.game.target
             }
@@ -413,6 +411,7 @@ module.exports = class RescueMode {
         if (polices.length > 0) {
             const police = polices[0]
             if (police) {
+                console.log(police.name)
                 if (police.game.target) {
                     if (police.game.target.game.job === JobType.MAFIA)
                         police.send(Serialize.SystemMessage('<color=red>' + police.game.target.name + '님은 마피아입니다.</color>'))
@@ -421,10 +420,11 @@ module.exports = class RescueMode {
                 }
             }
         }
-        const doctors = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA)
+        const doctors = this.onlyLivingUser().filter(user => user.game.job === JobType.DOCTOR)
         if (doctors.length > 0) {
             const doctor = doctors[0]
             if (doctor) {
+                console.log(doctor.name)
                 if (doctor.game.target) {
                     if (target === doctor.game.target) {
                         this.room.publish(Serialize.SystemMessage('화타에 의해 ' + target.name + '님이 기적적으로 살아났습니다!'))
