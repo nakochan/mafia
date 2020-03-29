@@ -394,29 +394,38 @@ module.exports = class RescueMode {
     checkNight() {
         console.log("checkNight")
         let target = null
-        const mafia = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA)
-        if (mafia) {
-            console.log(mafia.name)
-            console.log(mafia.game.target)
-            console.log(mafia.game.target.name)
-            if (mafia.game.target !== null)
-                target = mafia.game.target
-        }
-        const police = this.onlyLivingUser().filter(user => user.game.job === JobType.POLICE)
-        if (police) {
-            if (police.game.target !== null) {
-                if (police.game.target.game.job === JobType.MAFIA)
-                    police.send(Serialize.SystemMessage('<color=red>' + police.game.target.name + '님은 마피아입니다.</color>'))
-                else
-                    police.send(Serialize.SystemMessage(police.game.target.name + '님은 마피아가 아닙니다.'))
+        const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA)
+        if (mafias.length > 0) {
+            const mafia = mafias[0]
+            if (mafia) {
+                console.log(mafia.name)
+                console.log(mafia.game.target)
+                console.log(mafia.game.target.name)
+                if (mafia.game.target)
+                    target = mafia.game.target
             }
         }
-        const doctor = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA)
-        if (doctor) {
-            if (doctor.game.target !== null) {
-                if (target === doctor.game.target) {
-                    this.room.publish(Serialize.SystemMessage('화타에 의해 ' + target.name + '님이 기적적으로 살아났습니다!'))
-                    target = null
+        const polices = this.onlyLivingUser().filter(user => user.game.job === JobType.POLICE)
+        if (polices.length > 0) {
+            const police = polices[0]
+            if (police) {
+                if (police.game.target) {
+                    if (police.game.target.game.job === JobType.MAFIA)
+                        police.send(Serialize.SystemMessage('<color=red>' + police.game.target.name + '님은 마피아입니다.</color>'))
+                    else
+                        police.send(Serialize.SystemMessage(police.game.target.name + '님은 마피아가 아닙니다.'))
+                }
+            }
+        }
+        const doctors = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA)
+        if (doctors.length > 0) {
+            const doctor = doctors[0]
+            if (doctor) {
+                if (doctor.game.target) {
+                    if (target === doctor.game.target) {
+                        this.room.publish(Serialize.SystemMessage('화타에 의해 ' + target.name + '님이 기적적으로 살아났습니다!'))
+                        target = null
+                    }
                 }
             }
         }
