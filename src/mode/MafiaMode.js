@@ -21,8 +21,8 @@ module.exports = class RescueMode {
         this.map = MapType.TOWN
         this.mode = ModeType.MAFIA
         this.tick = 0
-        this.count = 5
-        this.maxCount = 5
+        this.count = 10
+        this.maxCount = 10
         this.days = 0
         this.mafiaTeam = []
         this.citizenTeam = []
@@ -70,6 +70,7 @@ module.exports = class RescueMode {
                 self.setGraphics(self.deadGraphics)
                 break
         }
+        console.log("A")
         const x = [16, 26, 32, 36, 39, 30, 26, 18, 9, 12]
         const y = [10, 9, 10, 19, 30, 32, 35, 32, 30, 19]
         const sign = new Event(this.roomId, {
@@ -84,11 +85,14 @@ module.exports = class RescueMode {
                 "command": ""
             }
         })
+        console.log("B")
         this.room.addEvent(sign)
         this.moveToDay(self)
         self.publishToMap(Serialize.SetGameTeam(self))
+        console.log("C")
         self.send(Serialize.UpdateModeInfo(self.game.job))
         self.publish(Serialize.ModeData(this))
+        console.log("D")
     }
 
     leave(self) {
@@ -248,6 +252,7 @@ module.exports = class RescueMode {
     }
 
     ready() {
+        console.log("ready")
         // this.room.lock = true
         this.init()
         for (const user of this.room.users) {
@@ -270,6 +275,7 @@ module.exports = class RescueMode {
     }
 
     day() {
+        console.log("day")
         this.count = 180
         this.state = STATE_DAY
         ++this.days
@@ -284,6 +290,7 @@ module.exports = class RescueMode {
     }
 
     checkDay() {
+        console.log("checkday")
         if (this.days <= 1)
             return this.night()
         this.count = 10
@@ -293,6 +300,7 @@ module.exports = class RescueMode {
     }
 
     suspect() {
+        console.log("suspect")
         this.room.publish(Serialize.CloseVote())
         const targets = this.onlyLivingUser().slice(0).sort((a, b) => b.game.count - a.game.count)
         const target = targets[0]
@@ -306,6 +314,7 @@ module.exports = class RescueMode {
     }
 
     lastDitch() {
+        console.log("lastDitch")
         this.count = 10
         this.state = STATE_DEATH_PENALTY
         for (const user of this.room.users) {
@@ -318,6 +327,7 @@ module.exports = class RescueMode {
     }
 
     vote() {
+        console.log("vote")
         this.state = STATE_VOTE
         if (this.target === null)
             return this.night()
@@ -332,10 +342,12 @@ module.exports = class RescueMode {
     }
 
     deathPenalty() {
+        console.log("death")
         this.night()
     }
 
     night() {
+        console.log("night")
         this.count = 60
         this.state = STATE_NIGHT
         for (const user of this.room.users)
@@ -344,6 +356,7 @@ module.exports = class RescueMode {
     }
 
     checkNight() {
+        console.log("checkNight")
         this.day()
     }
 
@@ -357,6 +370,7 @@ module.exports = class RescueMode {
             this.tick = 0
             switch (this.state) {
                 case STATE_READY:
+                    this.room.publish(Serialize.NoticeMessage(this.count))
                     if (this.count === 10)
                         this.ready()
                     break
