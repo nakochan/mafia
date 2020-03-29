@@ -300,13 +300,15 @@ module.exports = class RescueMode {
         console.log("checkday")
         this.count = 10
         this.state = STATE_SUSPECT
-        this.room.publish(Serialize.GetVote(this.onlyLivingUser()))
+        for (const user of onlyLivingUser())
+            user.send(Serialize.GetVote(this.onlyLivingUser()))
         this.room.publish(Serialize.ModeData(this))
     }
 
     suspect() {
         console.log("suspect")
-        this.room.publish(Serialize.CloseVote())
+        for (const user of onlyLivingUser())
+            user.send.publish(Serialize.CloseVote())
         const targets = this.onlyLivingUser().slice(0).sort((a, b) => b.game.count - a.game.count)
         if (targets.length < 1)
             return this.night()
@@ -343,9 +345,9 @@ module.exports = class RescueMode {
         let saveCount = this.onlyLivingUser().length - dieCount
         if (dieCount > saveCount) {
             if (this.target.game.job === JobType.MAFIA)
-                this.publish(Serialize.SystemMessage('<color=red>마피아를 찾아냈습니다!!!</color>'))
+                this.room.publish(Serialize.SystemMessage('<color=red>마피아를 찾아냈습니다!!!</color>'))
             else
-                this.publish(Serialize.SystemMessage('<color=red>선량한 시민이 죽었습니다...</color>'))
+                this.room.publish(Serialize.SystemMessage('<color=red>선량한 시민이 죽었습니다...</color>'))
             this.target.game.dead = true
             this.target.setGraphics(this.target.deadGraphics)
         }
