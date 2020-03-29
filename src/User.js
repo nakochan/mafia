@@ -741,6 +741,11 @@ global.User = (function () {
                 this.send(Serialize.MessageGame('REQUEST_REPORT_SUCCESS'))
         }
 
+        selectVote(index) {
+            if (!this.roomId) return
+            Room.get(this.roomId).selectVote(this, index)
+        }
+
         setSkin(id) {
             if (id < 1)
                 this.pureGraphics = 'KJT'
@@ -804,10 +809,7 @@ global.User = (function () {
             console.log(this.name + '(#' + this.roomId + '@' + this.place + '): ' + message)
             switch (room.type) {
                 case RoomType.GAME:
-                    if (this.game.team === TeamType.RED)
-                        this.redChat(message)
-                    else
-                        this.blueChat(message)
+                    this.gameChat(message)
                     break
                 case RoomType.PLAYGROUND:
                     this.publish(Serialize.ChatMessage(this.type, this.index, this.name, message))
@@ -955,13 +957,9 @@ global.User = (function () {
             }
         }
 
-        redChat(message) {
-            this.publish(Serialize.ChatMessage(this.type, this.index, `<color=#00A2E8>${this.name}</color>`, message))
-        }
-
-        blueChat(message) {
-            if (this.game.caught)
-                this.publishToMap(Serialize.ChatMessage(this.type, this.index, `<color=#808080>${this.name}</color>`, message))
+        gameChat(message) {
+            if (this.game.dead)
+                this.publish(Serialize.ChatMessage(this.type, this.index, `<color=#808080>[사망] ${this.name}</color>`, message))
             else
                 this.publish(Serialize.ChatMessage(this.type, this.index, `<color=#00A2E8>${this.name}</color>`, message))
         }

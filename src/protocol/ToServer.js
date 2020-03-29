@@ -48,6 +48,7 @@ module.exports = {
         'CLEAR_NOTICE_MESSAGE',
         'ADD_NOTICE_MESSAGE',
         'ADD_USER_REPORT',
-        'USE_ITEM'
+        'USE_ITEM',
+        'SELECT_VOTE'
     )
 }

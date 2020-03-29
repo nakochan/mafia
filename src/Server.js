@@ -268,6 +268,11 @@ module.exports = class Server {
 
         handler[ToServer.USE_ITEM] = async () => user.useItem()
 
+        handler[ToServer.SELECT_VOTE] = async data => {
+            const int32 = new Int32Array(data.buffer)
+            user.selectVote(int32[0])
+        }
+
         return handler
     }
 

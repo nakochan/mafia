@@ -514,6 +514,30 @@ my.GetRoomInfo = function (room, pick = 0) {
     return JSON.stringify(packet)
 }
 
+my.GetVote = function (users = []) {
+    const packet = {}
+    packet._head = ToClient.GET_VOTE
+    packet.users = users.map(i => ({
+        index: i.index,
+        name: i.pick + '. ' + i.name
+    }))
+    return JSON.stringify(packet)
+}
+
+my.SetUpVote = function (user) {
+    const packet = {}
+    packet._head = ToClient.SET_UP_VOTE
+    packet.index = user.index
+    packet.count = (user.hasOwnProperty('game') && user.game.hasOwnProperty('count')) ? user.game.count : 0
+    return JSON.stringify(packet)
+}
+
+my.CloseVote = function () {
+    const packet = {}
+    packet._head = ToClient.CLOSE_VOTE
+    return JSON.stringify(packet)
+}
+
 module.exports = {
     ...my
 }

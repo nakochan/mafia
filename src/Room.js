@@ -70,10 +70,7 @@ global.Room = (function () {
             this.type = type
             this.name = name
             this.users = []
-
-
             this.picks = []
-
             this.places = new Proxy({}, {
                 get: (target, name) => {
                     return target.hasOwnProperty(name) ? target[name] : target[name] = new Place(this.index, name)
@@ -100,6 +97,7 @@ global.Room = (function () {
             event.roomId = this.index
             event.index = this.nextEventUid++
             this.places[event.place].addEvent(event)
+            return event.index
         }
 
         removeEvent(event) {
@@ -208,6 +206,10 @@ global.Room = (function () {
 
         useItem(self) {
             this.mode.useItem(self)
+        }
+
+        selectVote(self, index) {
+            this.mode.selectVote(self, index)
         }
 
         canJoin() {

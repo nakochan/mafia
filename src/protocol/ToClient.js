@@ -52,6 +52,9 @@ module.exports = {
         'MESSAGE_GAME',
         'SET_ANIMATION',
         'COMBO_MESSAGE',
-        'GET_ROOM_INFO'
+        'GET_ROOM_INFO',
+        'GET_VOTE',
+        'SET_UP_VOTE',
+        'CLOSE_VOTE'
     )
 }
