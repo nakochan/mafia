@@ -92,7 +92,6 @@ module.exports = class RescueMode {
         console.log("C")
         self.send(Serialize.UpdateModeInfo(self.game.job))
         self.publish(Serialize.ModeData(this))
-        console.log("D")
     }
 
     leave(self) {
@@ -158,7 +157,7 @@ module.exports = class RescueMode {
             }
             self.send(Serialize.PlaySound(1, 'n14'))
         }
-        self.send(Serialize.SwitchLight(false))
+        self.send(Serialize.SwitchLight(true))
         self.send(Serialize.NoticeMessage('밤이 되었습니다.'))
     }
 
@@ -203,10 +202,10 @@ module.exports = class RescueMode {
     selectVote(self, index) {
         if (self.game.vote)
             return
-        const findIndex = this.users.findIndex(user => user.index === index)
+        const findIndex = this.room.users.findIndex(user => user.index === index)
         if (findIndex < 0)
             return
-        const user = this.users[findIndex]
+        const user = this.room.users[findIndex]
         if (!user)
             return
         if (self.game.vote === user)
@@ -276,7 +275,7 @@ module.exports = class RescueMode {
 
     day() {
         console.log("day")
-        this.count = 180
+        this.count = 30
         this.state = STATE_DAY
         ++this.days
         for (const user of this.room.users) {
@@ -291,8 +290,6 @@ module.exports = class RescueMode {
 
     checkDay() {
         console.log("checkday")
-        if (this.days <= 1)
-            return this.night()
         this.count = 10
         this.state = STATE_SUSPECT
         this.room.publish(Serialize.GetVote(this.onlyLivingUser()))
@@ -348,7 +345,7 @@ module.exports = class RescueMode {
 
     night() {
         console.log("night")
-        this.count = 60
+        this.count = 30
         this.state = STATE_NIGHT
         for (const user of this.room.users)
             this.moveToNight(user)
@@ -395,6 +392,8 @@ module.exports = class RescueMode {
                     break
             }
             --this.count
+
+            console.log("count: " + this.count)
         }
     }
 }
