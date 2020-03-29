@@ -189,23 +189,27 @@ module.exports = class RescueMode {
 
     drawUsers(self) {
         let selfHide = false
+        let selfNameHide = false
         const sameMapUsers = this.room.sameMapUsers(self.place)
         for (const user of sameMapUsers) {
             if (self === user)
                 continue
             let userHide = false
-            if (self.game.team !== user.game.team) {
-                if (!(self.admin > 1 && user.admin > 1)) {
-                    if (self.admin > 1)
-                        selfHide = true
-                    else if (user.admin > 1)
-                        userHide = true
-                    else
+            let userNameHide = false
+            switch (this.state) {
+                case STATE_NIGHT:
+                    if (self.game.job !== JobType.CITIZEN && user.game.job !== JobType.CITIZEN)
                         selfHide = userHide = true
-                }
+                    selfNameHide = userNameHide = true
+                    break
+                default:
+
+                    break
             }
-            self.send(Serialize.CreateGameObject(user, userHide))
-            user.send(Serialize.CreateGameObject(self, selfHide))
+            if (!userHide)
+                self.send(Serialize.CreateGameObject(user, userNameHide))
+            if (!selfHide)
+                user.send(Serialize.CreateGameObject(self, selfNameHide))
         }
     }
 
@@ -433,8 +437,11 @@ module.exports = class RescueMode {
                 }
             }
         }
-        if (target)
+        if (target) {
+            target.game.dead = true
+            target.setGraphics(target.deadGraphics)
             this.room.publish(Serialize.SystemMessage('<color=red>마피아에 의해 ' + target.name + '님이 사망했습니다...</color>'))
+        }
         this.day()
     }
 
