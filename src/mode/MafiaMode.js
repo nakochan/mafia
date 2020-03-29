@@ -279,6 +279,8 @@ module.exports = class RescueMode {
         for (const user of this.room.users) {
             user.game.count = 0
             user.game.vote = null
+            if (!user.game.dead)
+                user.setGraphics(user.pureGraphics)
             user.send(Serialize.NoticeMessage(this.days + '째날 아침이 밝았습니다...'))
             this.moveToDay(user)
         }
@@ -355,8 +357,11 @@ module.exports = class RescueMode {
         console.log("night")
         this.count = 30
         this.state = STATE_NIGHT
-        for (const user of this.room.users)
+        for (const user of this.room.users) {
+            if (!user.game.dead)
+                user.setGraphics('Shadow')
             this.moveToNight(user)
+        }
         this.room.publish(Serialize.ModeData(this))
     }
 
