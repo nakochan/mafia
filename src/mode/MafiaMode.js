@@ -70,7 +70,6 @@ module.exports = class RescueMode {
                 self.setGraphics(self.deadGraphics)
                 break
         }
-        console.log("A")
         const x = [16, 26, 32, 36, 39, 30, 26, 18, 9, 12]
         const y = [10, 9, 10, 19, 30, 32, 35, 32, 30, 19]
         const sign = new Event(this.roomId, {
@@ -85,11 +84,10 @@ module.exports = class RescueMode {
                 "command": ""
             }
         })
-        console.log("B")
         this.room.addEvent(sign)
+        this.room.publish(Serialize.CreateGameObject(sign))
         this.moveToDay(self)
         self.publishToMap(Serialize.SetGameTeam(self))
-        console.log("C")
         self.send(Serialize.UpdateModeInfo(self.game.job))
         self.publish(Serialize.ModeData(this))
     }
