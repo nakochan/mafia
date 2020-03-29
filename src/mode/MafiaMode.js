@@ -51,7 +51,8 @@ module.exports = class RescueMode {
             team: TeamType.DEFAULT,
             job: JobType.DEFAULT,
             count: 0,
-            vote: null,
+            vote: 0,
+            target: 0,
             dead: false,
             result: false
         }
@@ -107,17 +108,19 @@ module.exports = class RescueMode {
         const event = events.filter(e => e.owner === self.index)
         if (event)
             this.room.removeEvent(event)
-        // self.publish(Serialize.UpdateModeCount(this.score.red))
     }
 
     moveToDay(self) {
         self.teleport(1, 24, 14)
         self.send(Serialize.SwitchLight(false))
+        self.send(Serialize.ToggleInput(true))
         self.send(Serialize.PlaySound(1, 'hospital'))
     }
 
     moveToNight(self) {
         if (self.game.dead || self.game.job === JobType.MAFIA || self.game.job === JobType.POLICE || self.game.job === JobType.DOCTOR) {
+            if (!self.game.dead)
+                self.setGraphics('Shadow')
             self.teleport(2, 24, 14)
             self.send(Serialize.PlaySound(1, 'c24'))
         } else {
@@ -153,6 +156,7 @@ module.exports = class RescueMode {
                     self.teleport(12, 7, 6)
                     break
             }
+            self.send(Serialize.ToggleInput(false))
             self.send(Serialize.PlaySound(1, 'n14'))
         }
         self.send(Serialize.SwitchLight(true))
@@ -188,8 +192,12 @@ module.exports = class RescueMode {
     }
 
     hit(self, target) {
-        if (target.game.dead)
+        if (self.game.target > 0 || self.game.dead || target.game.dead)
             return false
+        else if (self.game.JobType === JobType.DEFAULT || self.game.JobType === JobType.CITIZEN || target.game.JobType === JobType.MAFIA)
+            return false
+        self.game.target = target.index
+        self.send(Serialize.SystemMessage(target.pick + '. ' + target.name + '님을 대상으로 지정합니다.'))
         return true
     }
 
@@ -198,7 +206,7 @@ module.exports = class RescueMode {
     }
 
     selectVote(self, index) {
-        if (self.game.vote)
+        if (self.game.vote > 0)
             return
         const findIndex = this.room.users.findIndex(user => user.index === index)
         if (findIndex < 0)
@@ -206,9 +214,9 @@ module.exports = class RescueMode {
         const user = this.room.users[findIndex]
         if (!user)
             return
-        if (self.game.vote === user)
+        if (self.game.vote === user.index)
             return
-        self.game.vote = user
+        self.game.vote = user.index
         ++user.game.count
         this.room.publish(Serialize.SetUpVote(user))
     }
@@ -243,8 +251,8 @@ module.exports = class RescueMode {
     init() {
         this.jobs = [
             JobType.MAFIA,
-            JobType.POLICE,
-            JobType.DOCTOR
+            //JobType.POLICE,
+            //JobType.DOCTOR
         ]
     }
 
@@ -278,7 +286,7 @@ module.exports = class RescueMode {
         ++this.days
         for (const user of this.room.users) {
             user.game.count = 0
-            user.game.vote = null
+            user.game.vote = 0
             if (!user.game.dead)
                 user.setGraphics(user.pureGraphics)
             user.send(Serialize.NoticeMessage(this.days + '째날 아침이 밝았습니다...'))
@@ -334,6 +342,10 @@ module.exports = class RescueMode {
         let dieCount = this.onlyLivingUser().filter(user => user.x <= 10).length
         let saveCount = this.onlyLivingUser().length - dieCount
         if (dieCount > saveCount) {
+            if (this.target.game.job === JobType.MAFIA)
+                this.publish(Serialize.SystemMessage('<color=red>마피아를 찾아냈습니다!!!</color>'))
+            else
+                this.publish(Serialize.SystemMessage('<color=red>선량한 시민이 죽었습니다...</color>'))
             this.target.game.dead = true
             this.target.setGraphics(this.target.deadGraphics)
         }
@@ -343,7 +355,7 @@ module.exports = class RescueMode {
 
     deathPenalty() {
         console.log("death")
-        this.count = 5
+        this.count = 3
         this.state = STATE_DEATH_PENALTY
         const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
         const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
@@ -357,11 +369,8 @@ module.exports = class RescueMode {
         console.log("night")
         this.count = 30
         this.state = STATE_NIGHT
-        for (const user of this.room.users) {
-            if (!user.game.dead)
-                user.setGraphics('Shadow')
+        for (const user of this.room.users)
             this.moveToNight(user)
-        }
         this.room.publish(Serialize.ModeData(this))
     }
 

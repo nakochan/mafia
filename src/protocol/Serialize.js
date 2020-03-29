@@ -294,6 +294,13 @@ my.SwitchLight = function (active) {
     return JSON.stringify(packet)
 }
 
+my.ToggleInput = function (active) {
+    const packet = {}
+    packet._head = ToClient.TOGGLE_INPUT
+    packet.active = active
+    return JSON.stringify(packet)
+}
+
 my.QuitGame = function () {
     const packet = {}
     packet._head = ToClient.QUIT_GAME

@@ -55,6 +55,7 @@ module.exports = {
         'GET_ROOM_INFO',
         'GET_VOTE',
         'SET_UP_VOTE',
-        'CLOSE_VOTE'
+        'CLOSE_VOTE',
+        'TOGGLE_INPUT'
     )
 }
