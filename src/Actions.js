@@ -1,5 +1,5 @@
 const Serialize = require('./protocol/Serialize')
-const { TeamType } = require('./util/const')
+const { ModeType, TeamType, JobType } = require('./util/const')
 const pix = require('./util/pix')
 
 const dr = [
@@ -90,9 +90,37 @@ class ManiaState {
     }
 }
 
+class OtherSelfState {
+    constructor(args = {}) { }
+
+    doAction(context, self) {
+        const room = Room.get(context.roomId)
+        if (!room)
+            return
+        if (room.mode.mode !== ModeType.MAFIA)
+            return
+        if (context.owner < 1)
+            return
+        const target = User.getByUserIndex(context.owner)
+        if (!target)
+            return
+        if (self.game.target || self.game.dead || target.game.dead)
+            return
+        if (self.game.JobType === JobType.DEFAULT || self.game.JobType === JobType.CITIZEN || target.game.JobType === JobType.MAFIA)
+            return
+        if (self.game.JobType !== JobType.DOCTOR && self === target)
+            return
+        self.game.target = target
+        self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
+    }
+
+    update(context) { }
+}
+
 module.exports = new Proxy({
     door: DoorState,
-    mania: ManiaState
+    mania: ManiaState,
+    otherSelf: OtherSelfState
 }, {
     get: function (target, name) {
         return target.hasOwnProperty(name) ? target[name] : State

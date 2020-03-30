@@ -4,6 +4,7 @@ const { TeamType, JobType, MapType, ModeType } = require('../util/const')
 const PlayerState = require('../PlayerState')
 const Event = require('../Event')
 const pix = require('../util/pix')
+const config = require('../config')
 
 const STATE_READY = 0
 const STATE_DAY = 1
@@ -65,28 +66,45 @@ module.exports = class RescueMode {
         switch (this.state) {
             case STATE_READY:
                 self.setGraphics(self.pureGraphics)
+                const SIGN_X = [16, 26, 32, 36, 39, 30, 26, 18, 9, 12]
+                const SIGN_Y = [10, 9, 10, 19, 30, 32, 35, 32, 30, 19]
+                const sign = new Event(this.roomId, {
+                    "name": self.pick + ". " + self.name + "의 집",
+                    "place": 2,
+                    "x": SIGN_X[self.pick - 1],
+                    "y": SIGN_Y[self.pick - 1],
+                    "graphics": "Sign",
+                    "owner": self.index,
+                    "collider": true,
+                    "action": {
+                        "command": ""
+                    }
+                })
+                this.room.addEvent(sign)
+                this.room.publish(Serialize.CreateGameObject(sign))
+                const OTHER_SELF_MAP = [3, 4, 5, 6, 7, 8, 9, 10]
+                const OTHER_SELF_X = [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+                const OTHER_SELF_Y = [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
+                const otherSelf = new Event(this.roomId, {
+                    "name": self.pick + ". " + self.name,
+                    "place": OTHER_SELF_MAP[self.pick - 1],
+                    "x": OTHER_SELF_X[self.pick - 1],
+                    "y": OTHER_SELF_Y[self.pick - 1],
+                    "graphics": self.pureGraphics,
+                    "owner": self.index,
+                    "collider": true,
+                    "action": {
+                        "command": "otherSelf"
+                    }
+                })
+                this.room.addEvent(otherSelf)
+                this.room.publish(Serialize.CreateGameObject(otherSelf))
                 break
             default:
                 self.game.dead = true
                 self.setGraphics(self.deadGraphics)
                 break
         }
-        const x = [16, 26, 32, 36, 39, 30, 26, 18, 9, 12]
-        const y = [10, 9, 10, 19, 30, 32, 35, 32, 30, 19]
-        const sign = new Event(this.roomId, {
-            "name": self.pick + ". " + self.name + "의 집",
-            "place": 2,
-            "x": x[self.pick - 1],
-            "y": y[self.pick - 1],
-            "graphics": "Sign",
-            "owner": self.index,
-            "collider": true,
-            "action": {
-                "command": ""
-            }
-        })
-        this.room.addEvent(sign)
-        this.room.publish(Serialize.CreateGameObject(sign))
         this.moveToDay(self)
         self.publishToMap(Serialize.SetGameTeam(self))
         self.send(Serialize.UpdateModeInfo(self.game.job))
@@ -106,10 +124,16 @@ module.exports = class RescueMode {
             this.result(TeamType.CITIZEN)
         self.game = {}
         self.setGraphics(self.pureGraphics)
-        const { events } = this.room.places[2]
-        const event = events.filter(e => e.owner === self.index)
-        if (event)
-            this.room.removeEvent(event)
+        this.removeSignAndOtherSelf(self)
+    }
+
+    removeSignAndOtherSelf(self) {
+        for (let i = 1; i <= config.MAP_COUNT; ++i) {
+            const { events } = this.room.places[i]
+            const event = events.filter(e => e.owner === self.index)
+            if (event)
+                this.room.removeEvent(event)
+        }
     }
 
     moveToDay(self) {
@@ -125,36 +149,37 @@ module.exports = class RescueMode {
             self.send(Serialize.PlaySound(1, 'c24'))
         } else {
             if (self.game.job === JobType.CITIZEN) {
+                self.setGraphics(this.pureGraphics)
                 switch (self.pick) {
                     case 1:
-                        self.teleport(3, 7, 6)
+                        self.teleport(3, 7, 6, 0, -1)
                         break
                     case 2:
-                        self.teleport(4, 7, 6)
+                        self.teleport(4, 7, 6, 0, -1)
                         break
                     case 3:
-                        self.teleport(5, 7, 6)
+                        self.teleport(5, 7, 6, 0, -1)
                         break
                     case 4:
-                        self.teleport(6, 7, 6)
+                        self.teleport(6, 7, 6, 0, -1)
                         break
                     case 5:
-                        self.teleport(7, 7, 6)
+                        self.teleport(7, 7, 6, 0, -1)
                         break
                     case 6:
-                        self.teleport(8, 7, 6)
+                        self.teleport(8, 7, 6, 0, -1)
                         break
                     case 7:
-                        self.teleport(9, 7, 6)
+                        self.teleport(9, 7, 6, 0, -1)
                         break
                     case 8:
-                        self.teleport(10, 7, 6)
+                        self.teleport(10, 7, 6, 0, -1)
                         break
                     case 9:
-                        self.teleport(11, 7, 6)
+                        self.teleport(11, 7, 6, 0, -1)
                         break
                     case 10:
-                        self.teleport(12, 7, 6)
+                        self.teleport(12, 7, 6, 0, -1)
                         break
                 }
                 self.send(Serialize.ToggleInput(false))
@@ -198,10 +223,12 @@ module.exports = class RescueMode {
             let userNameHide = false
             switch (this.state) {
                 case STATE_NIGHT:
-                    if (self.game.job !== JobType.CITIZEN && user.game.job !== JobType.CITIZEN)
-                        selfHide = userHide = true
-                    selfNameHide = userNameHide = true
+                    selfHide = userHide = true
                     break
+                case STATE_LAST_DITCH:
+                    selfNameHide = userNameHide = true
+                    if (user === this.target)
+                        userNameHide = false
                 default:
 
                     break
@@ -214,14 +241,6 @@ module.exports = class RescueMode {
     }
 
     hit(self, target) {
-        if (self === target)
-            return false
-        if (self.game.target || self.game.dead || target.game.dead)
-            return false
-        else if (self.game.JobType === JobType.DEFAULT || self.game.JobType === JobType.CITIZEN || target.game.JobType === JobType.MAFIA)
-            return false
-        self.game.target = target
-        self.send(Serialize.SystemMessage(target.pick + '. ' + target.name + '님을 대상으로 지정합니다.'))
         return true
     }
 
@@ -353,8 +372,10 @@ module.exports = class RescueMode {
         for (const user of this.room.users) {
             if (this.target === user)
                 user.teleport(13, 10, 7)
-            else
+            else {
+                user.setGraphics('Shadow')
                 user.teleport(13, 10, 13)
+            }
         }
         this.room.publish(Serialize.ModeData(this))
     }
@@ -373,6 +394,7 @@ module.exports = class RescueMode {
                 this.room.publish(Serialize.SystemMessage('<color=red>선량한 시민이 죽었습니다...</color>'))
             this.target.game.dead = true
             this.target.setGraphics(this.target.deadGraphics)
+            this.removeSignAndOtherSelf(this.target)
         }
         this.target = null
         this.deathPenalty()
@@ -406,7 +428,7 @@ module.exports = class RescueMode {
         if (mafias.length > 0) {
             const mafia = mafias[0]
             if (mafia) {
-                console.log(mafia.name)
+                console.log(mafia.index + " 마피아")
                 if (mafia.game.target)
                     target = mafia.game.target
             }
@@ -415,7 +437,7 @@ module.exports = class RescueMode {
         if (polices.length > 0) {
             const police = polices[0]
             if (police) {
-                console.log(police.name)
+                console.log(police.index + " 경찰")
                 if (police.game.target) {
                     if (police.game.target.game.job === JobType.MAFIA)
                         police.send(Serialize.SystemMessage('<color=red>' + police.game.target.name + '님은 마피아입니다.</color>'))
@@ -428,7 +450,7 @@ module.exports = class RescueMode {
         if (doctors.length > 0) {
             const doctor = doctors[0]
             if (doctor) {
-                console.log(doctor.name)
+                console.log(doctor.index + " 의사")
                 if (doctor.game.target) {
                     if (target === doctor.game.target) {
                         this.room.publish(Serialize.SystemMessage('화타에 의해 ' + target.name + '님이 기적적으로 살아났습니다!'))
@@ -440,6 +462,7 @@ module.exports = class RescueMode {
         if (target) {
             target.game.dead = true
             target.setGraphics(target.deadGraphics)
+            this.removeSignAndOtherSelf(target)
             this.room.publish(Serialize.SystemMessage('<color=red>마피아에 의해 ' + target.name + '님이 사망했습니다...</color>'))
         }
         this.day()

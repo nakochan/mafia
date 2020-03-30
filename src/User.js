@@ -103,7 +103,11 @@ global.User = (function () {
         }
 
         static getByUser(user) {
-            return User.users.find((u) => u === user)
+            return User.users.find(u => u === user)
+        }
+
+        static getByUserIndex(index) {
+            return User.users.find(u => u.index === index)
         }
 
         static async create(socket, verify) {
