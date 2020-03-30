@@ -133,6 +133,9 @@ class OtherSelfState {
             const jobName = ["", "마피아", "시민", "경찰", "의사", "간첩", "군인", "변호사", "조폭", "무당", "매춘부", "연인", "탐정", "테러리스트", "도둑", "살인마", "영매", "버스기사"]
             self.send(Serialize.SystemMessage('<color=red>' + target.name + '님의 직업은 ' + jobName[target.game.job] + '입니다.</color>'))
         }
+        if (self.game.job === JobType.GANGSTER)
+            target.game.threat = true
+
     }
 
     update(context) { }
