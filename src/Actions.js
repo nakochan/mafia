@@ -127,6 +127,8 @@ class OtherSelfState {
             else
                 self.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아가 아닙니다.</color>'))
         }
+        if (self.game.job === JobType.DOCTOR)
+            room.publish(Serialize.PlaySound(2, 'magical21'))
     }
 
     update(context) { }
