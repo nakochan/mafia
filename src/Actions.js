@@ -108,24 +108,18 @@ class OtherSelfState {
             return
         if (target.game.dead)
             return self.send(Serialize.NoticeMessage('죽은 사람은 대상으로 설정할 수 없습니다.'))
-        if (self.game.JobType === JobType.DEFAULT || self.game.JobType === JobType.CITIZEN)
+        if (self.game.job === JobType.DEFAULT || self.game.job === JobType.CITIZEN)
             return
-        if (self.game.JobType === JobType.MAFIA && self === target)
+        if (self.game.job === JobType.MAFIA && self === target)
             return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
-        //if (self.game.JobType === JobType.POLICE && self === target)
-        //    return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
-        console.log("A")
-        if (self.game.JobType === JobType.POLICE) {
-            console.log("B")
+        if (self.game.JobType === JobType.POLICE && self === target)
+            return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
+        if (self.game.job === JobType.POLICE) {
             if (target.game.job === JobType.MAFIA)
                 self.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아입니다.</color>'))
             else
                 self.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아가 아닙니다.</color>'))
-        } else {
-            console.log(self.game.JobType)
-            console.log("?????")
         }
-        console.log("C")
         self.game.target = target
         self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
     }
