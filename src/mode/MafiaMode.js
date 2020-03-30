@@ -420,7 +420,7 @@ module.exports = class RescueMode {
                 const subJobs = this.subJobs[rand]
                 this.subJobs.splice(this.subJobs.indexOf(subJobs), 1)
                 user.game.job = subJobs
-                if (subJobs === JobType.ARMY)
+                if (subJobs === JobType.ARMY || subJobs === JobType.SHAMAN)
                     user.game.life = 1
             } else
                 user.game.job = JobType.CITIZEN
@@ -583,7 +583,7 @@ module.exports = class RescueMode {
             if (thief) {
                 if (target) {
                     thief.game.job = target.game.job
-                    if (thief.game.job === JobType.ARMY)
+                    if (thief.game.job === JobType.ARMY || thief.game.job === JobType.SHAMAN)
                         thief.game.life = 1
                 } else {
                     thief.game.job = JobType.CITIZEN
