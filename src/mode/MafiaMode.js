@@ -52,10 +52,12 @@ module.exports = class RescueMode {
         return {
             team: TeamType.DEFAULT,
             job: JobType.DEFAULT,
+            days: 0,
             life: 0,
             count: 0,
             vote: 0,
             target: null,
+            cling: null,
             time: false,
             touch: false,
             threat: false,
@@ -156,7 +158,12 @@ module.exports = class RescueMode {
             self.teleport(2, 24, 14)
             self.send(Serialize.PlaySound(1, 'c24'))
         } else {
-            if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER || self.game.job === JobType.THIEF || (self.game.job === JobType.SPY && self.game.touch)) {
+            if (self.game.job === JobType.CITIZEN
+                || self.game.job === JobType.ARMY
+                || self.game.job === JobType.LAWYER
+                || self.game.job === JobType.THIEF
+                || (self.game.job === JobType.SPY && self.game.touch)
+                || (self.game.job === JobType.SHAMAN && self.game.life < 1)) {
                 self.setGraphics(this.pureGraphics)
                 switch (self.pick) {
                     case 1:
@@ -226,7 +233,12 @@ module.exports = class RescueMode {
             let hide = false
             switch (this.state) {
                 case STATE_NIGHT:
-                    if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER || self.game.job === JobType.THIEF || (self.game.job === JobType.SPY && self.game.touch))
+                    if (self.game.job === JobType.CITIZEN
+                        || self.game.job === JobType.ARMY
+                        || self.game.job === JobType.LAWYER
+                        || self.game.job === JobType.THIEF
+                        || (self.game.job === JobType.SPY && self.game.touch)
+                        || (self.game.job === JobType.SHAMAN && self.game.life < 1))
                         hide = true
                     break
                 default:
@@ -384,8 +396,10 @@ module.exports = class RescueMode {
             JobType.LAWYER,
             JobType.THIEF,
             JobType.SPIRIT,
-            JobType.GANGSTER
+            JobType.GANGSTER,
+            JobType.SHAMAN
         ]
+        this.supply()
     }
 
     ready() {
@@ -587,6 +601,16 @@ module.exports = class RescueMode {
             this.removeSignAndOtherSelf(target)
             this.room.publish(Serialize.SystemMessage('<color=red>마피아에 의해 ' + target.name + '님이 사망했습니다...</color>'))
             this.room.publish(Serialize.PlaySound(2, 'Scream'))
+            const shamans = this.onlyLivingUser().filter(user => user.game.job === JobType.SHAMAN)
+            if (shamans.length > 0) {
+                const shaman = shamans[0]
+                if (shaman) {
+                    if (shaman.game.cling && shaman.game.days >= this.days + 1) {
+                        const jobName = ["", "마피아", "시민", "경찰", "의사", "간첩", "군인", "변호사", "조폭", "무당", "매춘부", "연인", "탐정", "테러리스트", "도둑", "살인마", "영매", "버스기사"]
+                        shaman.send(Serialize.SystemMessage('<color=red>' + shaman.game.cling.name + '님의 직업은 ' + jobName[shaman.game.cling.game.job] + '입니다.</color>'))
+                    }
+                }
+            }
         } else {
             this.room.publish(Serialize.SystemMessage('<color=red>지난 밤에는 아무도 죽지 않았습니다.</color>'))
         }
@@ -600,6 +624,18 @@ module.exports = class RescueMode {
         else if (mafiaTeam < 1)
             return this.result(TeamType.CITIZEN)
         this.day()
+    }
+
+    supply() {
+        const newObjects = require('../../Assets/Mods/Eve000.json')[3]
+        for (const object of newObjects) {
+            const event = new Event(this.roomId, object)
+            event.place = 1
+            event.x = 24
+            event.y = 24
+            this.room.addEvent(event)
+            this.room.publishToMap(event.place, Serialize.CreateGameObject(event))
+        }
     }
 
     result(winner) {
@@ -713,7 +749,6 @@ module.exports = class RescueMode {
                     break
             }
             --this.count
-
             console.log("count: " + this.count)
         }
     }

@@ -110,6 +110,10 @@ class OtherSelfState {
             return self.send(Serialize.NoticeMessage('산 사람을 대상으로 설정할 수 없습니다.'))
         if (self.game.job !== JobType.SPIRIT && target.game.dead)
             return self.send(Serialize.NoticeMessage('죽은 사람을 대상으로 설정할 수 없습니다.'))
+        if (self.game.job === JobType.SHAMAN && target.game.dead)
+            return self.send(Serialize.NoticeMessage('죽은 사람을 대상으로 설정할 수 없습니다.'))
+        if (self.game.job === JobType.SHAMAN && self.game.life < 1)
+            return
         if (self.game.job === JobType.DEFAULT || self.game.job === JobType.CITIZEN)
             return
         if ((self.game.job === JobType.MAFIA || self.game.JobType === JobType.POLICE || self.game.JobType === JobType.SPIRIT || self.game.JobType === JobType.GANGSTER) && self === target)
@@ -134,6 +138,12 @@ class OtherSelfState {
                 return self.send(Serialize.SystemMessage('<color=red>두번째 날부터 직업을 알아낼 수 있습니다.</color>'))
             self.send(Serialize.SystemMessage('<color=red>' + target.name + '님의 직업은 ' + jobName[target.game.job] + '입니다.</color>'))
         }
+        if (self.game.job === JobType.SHAMAN) {
+            self.game.days = room.mode.days + 3
+            self.game.life = 0
+            self.game.cling = target
+            self.send(Serialize.SystemMessage('<color=red>살을 날렸으므로, 3일 후 마피아인지 아닌지 결과가 나오게 됩니다.</color>'))
+        }
         if (self.game.job === JobType.GANGSTER)
             target.game.threat = true
         if (self.game.job === JobType.SPY) {
@@ -153,10 +163,27 @@ class OtherSelfState {
     update(context) { }
 }
 
+class ObstacleState {
+    constructor(args = {}) {
+        this.moveSound = args['moveSound'] || '3'
+    }
+
+    doAction(context, self) {
+        const room = Room.get(context.roomId)
+        if (!room) return
+        self.publishToMap(Serialize.PlaySound(this.moveSound))
+        if (room.isPassable(self.place, context.x + self.direction.x, context.y - self.direction.y, self.direction, true))
+            context.move(self.direction.x, -self.direction.y)
+        else
+            context.move(-self.direction.x, self.direction.y)
+    }
+}
+
 module.exports = new Proxy({
     door: DoorState,
     mania: ManiaState,
-    otherSelf: OtherSelfState
+    otherSelf: OtherSelfState,
+    obstacle: ObstacleState
 }, {
     get: function (target, name) {
         return target.hasOwnProperty(name) ? target[name] : State

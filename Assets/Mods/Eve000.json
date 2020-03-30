@@ -31,7 +31,7 @@
 			"place": 0,
 			"x": 0,
 			"y": 0,
-			"graphics": "ud_toilet",
+			"graphics": "Ball",
 			"collider": true,
 			"action": {
 				"command": "obstacle"
