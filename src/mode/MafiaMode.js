@@ -325,7 +325,7 @@ module.exports = class RescueMode {
         if (self.game.vote === user.index)
             return
         self.game.vote = user.index
-        ++user.game.count
+        user.game.count += self.game.job === JobType.LAWYER ? 2 : 1
         this.room.publish(Serialize.SetUpVote(user))
     }
 
