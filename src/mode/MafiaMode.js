@@ -625,7 +625,7 @@ module.exports = class RescueMode {
                         this.ready()
                     break
                 case STATE_DAY:
-                    if (this.count === 0)
+                    if (this.count <= 0)
                         this.checkDay()
                     break
                 case STATE_NIGHT:
