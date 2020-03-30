@@ -272,7 +272,7 @@ module.exports = class RescueMode {
         else {
             switch (this.state) {
                 case STATE_NIGHT:
-                    if (self.game.job !== JobType.MAFIA && self.game.job !== JobType.SPY && self.game.job !== JobType.BITCH)
+                    if (self.game.job === JobType.MAFIA || self.game.job === JobType.SPY || self.game.job === JobType.BITCH)
                         this.broadcastToMafia(Serialize.ChatMessage(self.type, self.index, `<color=#C90000>${self.name}</color>`, message))
                     else
                         self.send(Serialize.SystemMessage('<color=red>밤에 대화할 수 없는 직업입니다.</color>'))

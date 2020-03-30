@@ -114,6 +114,8 @@ class OtherSelfState {
             return
         if ((self.game.job === JobType.MAFIA || self.game.JobType === JobType.POLICE || self.game.JobType === JobType.SPIRIT || self.game.JobType === JobType.GANGSTER) && self === target)
             return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
+        if (self.game.job === JobType.MAFIA && target.game.job === JobType.MAFIA)
+            return self.send(Serialize.NoticeMessage('같은 마피아 직업은 살해할 수 없습니다.'))
         self.game.target = target
         self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
         if (self.game.job === JobType.MAFIA)
