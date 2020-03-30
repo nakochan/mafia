@@ -152,14 +152,6 @@ global.Room = (function () {
             }
         }
 
-        broadcastToDead(self, data) {
-            const { users } = this.places[self.place]
-            for (const user of users) {
-                if (user.game.dead)
-                    user.send(data)
-            }
-        }
-
         publishToMap(place, data) {
             const { users } = this.places[place]
             for (const user of users)

@@ -110,7 +110,7 @@ class OtherSelfState {
             return self.send(Serialize.NoticeMessage('죽은 사람은 대상으로 설정할 수 없습니다.'))
         if (self.game.job === JobType.DEFAULT || self.game.job === JobType.CITIZEN)
             return
-        if ((self.game.job === JobType.MAFIA || self.game.JobType === JobType.POLICE) && self === target)
+        if ((self.game.job === JobType.MAFIA || self.game.JobType === JobType.POLICE || self.game.JobType === JobType.SPIRIT || self.game.JobType === JobType.GANGSTER) && self === target)
             return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
         self.game.target = target
         self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
@@ -129,6 +129,10 @@ class OtherSelfState {
         }
         if (self.game.job === JobType.DOCTOR)
             room.publish(Serialize.PlaySound(2, 'magical21'))
+        if (self.game.job === JobType.SPIRIT) {
+            const jobName = ["", "마피아", "시민", "경찰", "의사", "간첩", "군인", "변호사", "조폭", "무당", "매춘부", "연인", "탐정", "테러리스트", "도둑", "살인마", "영매", "버스기사"]
+            self.send(Serialize.SystemMessage('<color=red>' + target.name + '님의 직업은 ' + jobName[target.game.job] + '입니다.</color>'))
+        }
     }
 
     update(context) { }

@@ -57,6 +57,7 @@ module.exports = class RescueMode {
             vote: 0,
             target: null,
             time: false,
+            threat: false,
             dead: false,
             result: false
         }
@@ -154,7 +155,7 @@ module.exports = class RescueMode {
             self.teleport(2, 24, 14)
             self.send(Serialize.PlaySound(1, 'c24'))
         } else {
-            if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER) {
+            if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER || self.game.job === JobType.THIEF) {
                 switch (self.pick) {
                     case 1:
                         self.teleport(3, 7, 6, 0, -1)
@@ -201,6 +202,9 @@ module.exports = class RescueMode {
                     case JobType.DOCTOR:
                         self.send(Serialize.SystemMessage('<color=red>살릴 사람의 집에 찾아가 공격 버튼을 클릭하세요...</color>'))
                         break
+                    case JobType.SPIRIT:
+                        self.send(Serialize.SystemMessage('<color=red>원하는 사람에게 찾아가 공격 버튼을 클릭하여 직업을 알아보세요...</color>'))
+                        break
                 }
                 self.game.target = null
                 self.setGraphics('Shadow')
@@ -218,7 +222,7 @@ module.exports = class RescueMode {
             let hide = false
             switch (this.state) {
                 case STATE_NIGHT:
-                    if (self.game.job === JobType.CITIZEN)
+                    if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER || self.game.job === JobType.THIEF)
                         hide = true
                     break
                 default:
@@ -264,7 +268,7 @@ module.exports = class RescueMode {
 
     gameChat(self, message) {
         if (self.game.dead)
-            this.room.broadcastToDead(self, Serialize.ChatMessage(self.type, self.index, `<color=#808080>[관전] ${self.name}</color>`, message))
+            this.broadcastToDead(Serialize.ChatMessage(self.type, self.index, `<color=#808080>[관전] ${self.name}</color>`, message))
         else {
             switch (this.state) {
                 case STATE_NIGHT:
@@ -364,7 +368,10 @@ module.exports = class RescueMode {
         ]
         this.subJobs = [
             JobType.ARMY,
-            JobType.LAWYER
+            JobType.LAWYER,
+            JobType.THIEF,
+            JobType.SPIRIT,
+            JobType.GANGSTER
         ]
     }
 
@@ -420,8 +427,12 @@ module.exports = class RescueMode {
         console.log("checkday")
         this.count = 10
         this.state = STATE_SUSPECT
-        for (const user of this.room.users)
-            user.send(Serialize.GetVote(this.onlyLivingUser()))
+        for (const user of this.room.users) {
+            if (user.game.threat)
+                user.send(Serialize.SystemMessage('<color=red>조폭에게 협박을 당해 낮에 투표할 수 없습니다!!!</color>'))
+            else
+                user.send(Serialize.GetVote(this.onlyLivingUser()))
+        }
         this.room.publish(Serialize.ModeData(this))
     }
 
@@ -447,6 +458,8 @@ module.exports = class RescueMode {
         this.count = 10
         this.state = STATE_LAST_DITCH
         for (const user of this.room.users) {
+            if (user.game.threat)
+                user.game.threat = false
             if (this.target === user)
                 user.teleport(13, 10, 7)
             else {
@@ -533,6 +546,22 @@ module.exports = class RescueMode {
                 }
             }
         }
+        const thiefs = this.onlyLivingUser().filter(user => user.game.job === JobType.THIEF)
+        if (thiefs.length > 0) {
+            const thief = thiefs[0]
+            if (thief) {
+                if (target) {
+                    thief.game.job = target.game.job
+                    if (thief.game.job === JobType.ARMY)
+                        thief.game.life = 1
+                    thief.send(Serialize.SetGameTeam(thief))
+                    thief.send(Serialize.UpdateModeInfo(thief.game.job))
+                } else {
+                    thief.game.job = JobType.CITIZEN
+                }
+                thief.send(Serialize.SystemMessage('<color=red>직업이 변했습니다!</color>'))
+            }
+        }
         if (target) {
             target.game.dead = true
             target.setGraphics(target.deadGraphics)
@@ -612,6 +641,13 @@ module.exports = class RescueMode {
                     break
             }
             blue.send(Serialize.ResultGame(winner, rank, persons, mission, exp, coin))
+        }
+    }
+
+    broadcastToDead(data) {
+        for (const user of this.room.users) {
+            if (user.game.dead || user.game.job === JobType.SPIRIT)
+                user.send(data)
         }
     }
 
