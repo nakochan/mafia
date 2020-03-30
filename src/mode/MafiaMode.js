@@ -235,6 +235,7 @@ module.exports = class RescueMode {
             switch (this.state) {
                 case STATE_NIGHT:
                     selfHide = userHide = true
+                    selfNameHide = userNameHide = true
                     if (self.game.job !== JobType.CITIZEN && user.game.job === JobType.CITIZEN)
                         selfHide = false
                     break
@@ -414,6 +415,7 @@ module.exports = class RescueMode {
                 this.room.publish(Serialize.SystemMessage('<color=red>선량한 시민이 죽었습니다...</color>'))
             this.target.game.dead = true
             this.target.setGraphics(this.target.deadGraphics)
+            this.room.publish(Serialize.PlaySound(2, 'Scream'))
             this.removeSignAndOtherSelf(this.target)
         }
         this.target = null
@@ -449,8 +451,10 @@ module.exports = class RescueMode {
             const mafia = mafias[0]
             if (mafia) {
                 console.log(mafia.index + " 마피아")
-                if (mafia.game.target)
+                if (mafia.game.target) {
                     target = mafia.game.target
+                    this.room.publish(Serialize.PlaySound(2, 'Scream'))
+                }
             }
         }
         const polices = this.onlyLivingUser().filter(user => user.game.job === JobType.POLICE)

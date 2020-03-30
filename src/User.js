@@ -963,7 +963,7 @@ global.User = (function () {
 
         gameChat(message) {
             if (this.game.dead)
-                this.publish(Serialize.ChatMessage(this.type, this.index, `<color=#808080>[사망] ${this.name}</color>`, message))
+                this.broadcastToDead(Serialize.ChatMessage(this.type, this.index, `<color=#808080>[사망] ${this.name}</color>`, message))
             else
                 this.publish(Serialize.ChatMessage(this.type, this.index, `<color=#00A2E8>${this.name}</color>`, message))
         }
@@ -1086,6 +1086,13 @@ global.User = (function () {
                 return
             Room.get(this.roomId).broadcastToMap(this, data)
         }
+
+        broadcastToDead(data) {
+            if (!this.roomId)
+                return
+            Room.get(this.roomId).broadcastToDead(this, data)
+        }
+
 
         publishToMap(data) {
             if (!this.roomId)
