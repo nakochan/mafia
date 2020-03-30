@@ -509,8 +509,8 @@ module.exports = class RescueMode {
         console.log("death")
         this.count = 2
         this.state = STATE_DEATH_PENALTY
-        const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
-        if (mafias < 1)
+        const mafiaPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
+        if (mafiaPersons < 1)
             return this.result(TeamType.CITIZEN)
         const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
         const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
@@ -588,8 +588,8 @@ module.exports = class RescueMode {
         } else {
             this.room.publish(Serialize.SystemMessage('<color=red>지난 밤에는 아무도 죽지 않았습니다.</color>'))
         }
-        const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
-        if (mafias < 1)
+        const mafiaPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
+        if (mafiaPersons < 1)
             return this.result(TeamType.CITIZEN)
         const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
         const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
