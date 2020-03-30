@@ -395,7 +395,7 @@ module.exports = class RescueMode {
                 const rand = Math.floor(Math.random() * this.jobs.length)
                 const job = this.jobs[rand]
                 this.jobs.splice(this.jobs.indexOf(job), 1)
-                if (job === JobType.MAFIA) {
+                if (job === JobType.MAFIA || job === JobType.SPY) {
                     this.citizenTeam.splice(this.citizenTeam.indexOf(user), 1)
                     this.mafiaTeam.push(user)
                     user.game.team = TeamType.MAFIA

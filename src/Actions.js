@@ -142,10 +142,10 @@ class OtherSelfState {
             } else {
                 if (target.game.job === JobType.MAFIA) {
                     self.game.touch = true
-                    self.send(Serialize.NoticeMessage('<color=red>마피아와 밤에 채팅이 가능하며 다음 밤부터 직업 조사가 가능합니다.</color>'))
-                    room.mode.broadcastToMafia(Serialize.NoticeMessage(`<color=red>${self.name}님께서 접선에 성공했습니다.</color>`))
+                    self.send(Serialize.SystemMessage('<color=red>마피아와 밤에 채팅이 가능하며 다음 밤부터 직업 조사가 가능합니다.</color>'))
+                    room.mode.broadcastToMafia(Serialize.SystemMessage(`<color=red>${self.name}님께서 접선에 성공했습니다.</color>`))
                 } else
-                    self.send(Serialize.NoticeMessage('<color=red>마피아가 아닙니다...</color>'))
+                    self.send(Serialize.SystemMessage('<color=red>마피아가 아닙니다...</color>'))
             }
         }
     }
