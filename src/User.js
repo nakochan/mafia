@@ -831,14 +831,14 @@ global.User = (function () {
         command(message) {
             if (message.substring(0, 1) === '#') {
                 if (this.admin < 1) {
-                    if (this.cash < 20)
+                    /*if (this.cash < 20)
                         this.send(Serialize.SystemMessage('<color=red>보석이 부족합니다. 보석 20개가 필요합니다.</color>'))
                     else {
                         this.notice(Serialize.SystemMessage('<color=#1DDB16>' + this.name + '#' + this.roomId + ': ' + message.substring(1) + '</color>'))
                         this.setUpCash(-20)
-                    }
+                    }*/
                 } else
-                    this.notice(Serialize.SystemMessage('<color=#EFE4B0>@[' + (this.admin === 1 ? '클린유저' : '운영진') + '] ' + this.name + ': ' + message.substring(1) + '</color>'))
+                    this.notice(Serialize.SystemMessage('<color=#EFE4B0>@[' + (this.admin === 1 ? '운영자' : '개발자') + '] ' + this.name + ': ' + message.substring(1) + '</color>'))
                 return true
             }
             if (this.admin < 1)
