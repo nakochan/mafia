@@ -9,7 +9,9 @@ const JobType = {
     MAFIA: 1,
     CITIZEN: 2,
     POLICE: 3,
-    DOCTOR: 4
+    DOCTOR: 4,
+    ARMY: 5,
+    LAWYER: 6
 }
 
 const RoomType = {

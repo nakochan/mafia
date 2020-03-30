@@ -116,6 +116,12 @@ class OtherSelfState {
             return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
         self.game.target = target
         self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
+        if (self.game.JobType === JobType.POLICE) {
+            if (target.game.job === JobType.MAFIA)
+                police.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아입니다.</color>'))
+            else
+                police.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아가 아닙니다.</color>'))
+        }
     }
 
     update(context) { }

@@ -28,6 +28,7 @@ module.exports = class RescueMode {
         this.mafiaTeam = []
         this.citizenTeam = []
         this.jobs = []
+        this.subJobs = []
         this.target = null
         this.room = Room.get(this.roomId)
         /*const objects = require('../../Assets/Mods/Mod' + ('' + this.mode).padStart(3, '0') + '.json')[this.map]
@@ -51,6 +52,7 @@ module.exports = class RescueMode {
         return {
             team: TeamType.DEFAULT,
             job: JobType.DEFAULT,
+            life: 0,
             count: 0,
             vote: 0,
             target: null,
@@ -137,7 +139,10 @@ module.exports = class RescueMode {
     }
 
     moveToDay(self) {
-        self.teleport(1, 24, 14)
+        if (self.game.dead)
+            self.teleport(1, 24, 10)
+        else
+            self.teleport(1, 24, 14)
         self.send(Serialize.SwitchLight(false))
         self.send(Serialize.ToggleInput(true))
         self.send(Serialize.PlaySound(1, 'hospital'))
@@ -250,7 +255,7 @@ module.exports = class RescueMode {
                     break
                 default:
                     if (self.game.dead && !user.game.dead)
-                        selfHide = true
+                        selfNameHide = true
                     break
             }
             if (!userHide)
@@ -269,7 +274,7 @@ module.exports = class RescueMode {
     }
 
     selectVote(self, index) {
-        if (self.game.vote > 0)
+        if (self.game.dead || self.game.vote > 0)
             return
         const findIndex = this.room.users.findIndex(user => user.index === index)
         if (findIndex < 0)
@@ -317,6 +322,10 @@ module.exports = class RescueMode {
             JobType.POLICE,
             JobType.DOCTOR
         ]
+        this.subJobs = [
+            JobType.ARMY,
+            JobType.LAWYER
+        ]
     }
 
     ready() {
@@ -363,14 +372,14 @@ module.exports = class RescueMode {
         console.log("checkday")
         this.count = 10
         this.state = STATE_SUSPECT
-        for (const user of this.onlyLivingUser())
+        for (const user of this.room.users)
             user.send(Serialize.GetVote(this.onlyLivingUser()))
         this.room.publish(Serialize.ModeData(this))
     }
 
     suspect() {
         console.log("suspect")
-        for (const user of this.onlyLivingUser())
+        for (const user of this.room.users)
             user.send(Serialize.CloseVote())
         const targets = this.onlyLivingUser().slice(0).sort((a, b) => b.game.count - a.game.count)
         if (targets.length < 1)
@@ -450,31 +459,14 @@ module.exports = class RescueMode {
         if (mafias.length > 0) {
             const mafia = mafias[0]
             if (mafia) {
-                console.log(mafia.index + " 마피아")
-                if (mafia.game.target) {
+                if (mafia.game.target)
                     target = mafia.game.target
-                    this.room.publish(Serialize.PlaySound(2, 'Scream'))
-                }
-            }
-        }
-        const polices = this.onlyLivingUser().filter(user => user.game.job === JobType.POLICE)
-        if (polices.length > 0) {
-            const police = polices[0]
-            if (police) {
-                console.log(police.index + " 경찰")
-                if (police.game.target) {
-                    if (police.game.target.game.job === JobType.MAFIA)
-                        police.send(Serialize.SystemMessage('<color=red>' + police.game.target.name + '님은 마피아입니다.</color>'))
-                    else
-                        police.send(Serialize.SystemMessage(police.game.target.name + '님은 마피아가 아닙니다.'))
-                }
             }
         }
         const doctors = this.onlyLivingUser().filter(user => user.game.job === JobType.DOCTOR)
         if (doctors.length > 0) {
             const doctor = doctors[0]
             if (doctor) {
-                console.log(doctor.index + " 의사")
                 if (doctor.game.target) {
                     if (target === doctor.game.target) {
                         if (doctor === target)
@@ -491,6 +483,7 @@ module.exports = class RescueMode {
             target.setGraphics(target.deadGraphics)
             this.removeSignAndOtherSelf(target)
             this.room.publish(Serialize.SystemMessage('<color=red>마피아에 의해 ' + target.name + '님이 사망했습니다...</color>'))
+            this.room.publish(Serialize.PlaySound(2, 'Scream'))
         } else {
             this.room.publish(Serialize.SystemMessage('<color=red>지난 밤에는 아무도 죽지 않았습니다.</color>'))
         }
