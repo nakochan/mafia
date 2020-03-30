@@ -162,7 +162,6 @@ module.exports = class RescueMode {
                 || self.game.job === JobType.ARMY
                 || self.game.job === JobType.LAWYER
                 || self.game.job === JobType.THIEF
-                || (self.game.job === JobType.SPY && self.game.touch)
                 || (self.game.job === JobType.SHAMAN && self.game.life < 1)) {
                 self.setGraphics(this.pureGraphics)
                 switch (self.pick) {
@@ -237,7 +236,6 @@ module.exports = class RescueMode {
                         || self.game.job === JobType.ARMY
                         || self.game.job === JobType.LAWYER
                         || self.game.job === JobType.THIEF
-                        || (self.game.job === JobType.SPY && self.game.touch)
                         || (self.game.job === JobType.SHAMAN && self.game.life < 1))
                         hide = true
                     break
