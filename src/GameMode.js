@@ -41,7 +41,11 @@ module.exports = class GameMode {
         }
     }
 
-    attack(self, target) {
+    gameChat(self, message) {
+        this.room.publish(Serialize.ChatMessage(self.type, self.index, `<color=#00A2E8>${self.name}</color>`, message))
+    }
+
+    hit(self, target) {
         return true
     }
 

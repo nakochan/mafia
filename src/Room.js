@@ -196,6 +196,10 @@ global.Room = (function () {
             this.draw(self)
         }
 
+        gameChat(self, message) {
+            this.mode.gameChat(self, message)
+        }
+
         hit(self) {
             const { users, events } = this.places[self.place]
             for (const user of users) {

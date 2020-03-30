@@ -962,12 +962,10 @@ global.User = (function () {
         }
 
         gameChat(message) {
-            if (this.game.dead)
-                this.broadcastToDead(Serialize.ChatMessage(this.type, this.index, `<color=#808080>[사망] ${this.name}</color>`, message))
-            else
-                this.publish(Serialize.ChatMessage(this.type, this.index, `<color=#00A2E8>${this.name}</color>`, message))
+            if (!this.roomId)
+                return
+            Room.get(this.roomId).gameChat(this, message)
         }
-
 
         entry(type = RoomType.GAME) {
             if (this.roomId)

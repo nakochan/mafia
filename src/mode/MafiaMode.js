@@ -140,7 +140,7 @@ module.exports = class RescueMode {
 
     moveToDay(self) {
         if (self.game.dead)
-            self.teleport(1, 24, 10)
+            self.teleport(1, 24, 24)
         else
             self.teleport(1, 24, 14)
         self.send(Serialize.SwitchLight(false))
@@ -262,6 +262,21 @@ module.exports = class RescueMode {
                 self.send(Serialize.CreateGameObject(user, userNameHide))
             if (!selfHide)
                 user.send(Serialize.CreateGameObject(self, selfNameHide))
+        }
+    }
+
+    gameChat(self, message) {
+        if (self.game.dead)
+            this.room.broadcastToDead(Serialize.ChatMessage(self.type, self.index, `<color=#808080>[사망] ${self.name}</color>`, message))
+        else {
+            switch (this.state) {
+                case STATE_NIGHT:
+                    self.send(Serialize.SystemMessage('<color=red>밤에 대화할 수 없는 직업입니다.</color>'))
+                    break
+                default:
+                    this.room.publish(Serialize.ChatMessage(self.type, self.index, `<color=#00A2E8>${self.name}</color>`, message))
+                    break
+            }
         }
     }
 
