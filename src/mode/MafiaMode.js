@@ -273,6 +273,14 @@ module.exports = class RescueMode {
                 case STATE_NIGHT:
                     self.send(Serialize.SystemMessage('<color=red>밤에 대화할 수 없는 직업입니다.</color>'))
                     break
+                case STATE_LAST_DITCH:
+                    if (self !== this.target) {
+                        self.send(Serialize.SystemMessage('<color=red>최후의 변론자만 대화할 수 있습니다.</color>'))
+                        break
+                    }
+                case STATE_DEATH_PENALTY:
+                    self.send(Serialize.SystemMessage('<color=red>지금은 대화할 수 없습니다.</color>'))
+                    break
                 default:
                     this.room.publish(Serialize.ChatMessage(self.type, self.index, `<color=#00A2E8>${self.name}</color>`, message))
                     break
@@ -448,7 +456,7 @@ module.exports = class RescueMode {
 
     deathPenalty() {
         console.log("death")
-        this.count = 3
+        this.count = 2
         this.state = STATE_DEATH_PENALTY
         const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
         const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
