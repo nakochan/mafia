@@ -120,7 +120,8 @@ class OtherSelfState {
                 target.send(Serialize.SystemMessage('<color=red>방탄복 덕분에 마피아의 총격으로부터 보호를 받았다!!</color>'))
             }
             room.publish(Serialize.PlaySound(2, 'Gun'))
-        } else if (self.game.job === JobType.POLICE) {
+        }
+        if (self.game.job === JobType.POLICE) {
             if (target.game.job === JobType.MAFIA)
                 self.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아입니다.</color>'))
             else

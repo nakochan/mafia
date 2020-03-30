@@ -154,7 +154,7 @@ module.exports = class RescueMode {
             self.teleport(2, 24, 14)
             self.send(Serialize.PlaySound(1, 'c24'))
         } else {
-            if (self.game.job === JobType.CITIZEN) {
+            if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER) {
                 switch (self.pick) {
                     case 1:
                         self.teleport(3, 7, 6, 0, -1)
