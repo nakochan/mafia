@@ -227,10 +227,13 @@ module.exports = class RescueMode {
                     break
                 case STATE_LAST_DITCH:
                     selfNameHide = userNameHide = true
+                    if (self === this.target)
+                        selfNameHide = false
                     if (user === this.target)
                         userNameHide = false
                 default:
-
+                    if (!self.game.dead && user.game.dead)
+                        userHide = true
                     break
             }
             if (!userHide)
@@ -373,7 +376,8 @@ module.exports = class RescueMode {
             if (this.target === user)
                 user.teleport(13, 10, 7)
             else {
-                user.setGraphics('Shadow')
+                if (!user.game.dead)
+                    user.setGraphics('Shadow')
                 user.teleport(13, 10, 13)
             }
         }
@@ -453,7 +457,10 @@ module.exports = class RescueMode {
                 console.log(doctor.index + " 의사")
                 if (doctor.game.target) {
                     if (target === doctor.game.target) {
-                        this.room.publish(Serialize.SystemMessage('화타에 의해 ' + target.name + '님이 기적적으로 살아났습니다!'))
+                        if (doctor === target)
+                            this.room.publish(Serialize.SystemMessage('의사는 죽음을 매우 두려워 했습니다...'))
+                        else
+                            this.room.publish(Serialize.SystemMessage('현명한 의사 덕에 ' + target.name + '님이 기적적으로 살아났습니다!'))
                         target = null
                     }
                 }
@@ -464,7 +471,15 @@ module.exports = class RescueMode {
             target.setGraphics(target.deadGraphics)
             this.removeSignAndOtherSelf(target)
             this.room.publish(Serialize.SystemMessage('<color=red>마피아에 의해 ' + target.name + '님이 사망했습니다...</color>'))
+        } else {
+            this.room.publish(Serialize.SystemMessage('<color=red>지난 밤에는 아무도 죽지 않았습니다.</color>'))
         }
+        const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
+        const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
+        if (mafiaTeam >= citizenTeam)
+            return this.result(TeamType.MAFIA)
+        else if (mafiaTeam < 1)
+            return this.result(TeamType.CITIZEN)
         this.day()
     }
 
