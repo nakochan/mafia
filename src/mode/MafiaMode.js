@@ -156,6 +156,7 @@ module.exports = class RescueMode {
             self.send(Serialize.PlaySound(1, 'c24'))
         } else {
             if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER || self.game.job === JobType.THIEF) {
+                self.setGraphics(this.pureGraphics)
                 switch (self.pick) {
                     case 1:
                         self.teleport(3, 7, 6, 0, -1)
@@ -188,7 +189,6 @@ module.exports = class RescueMode {
                         self.teleport(12, 7, 6, 0, -1)
                         break
                 }
-                self.setGraphics(this.pureGraphics)
                 self.send(Serialize.ToggleInput(false))
                 self.send(Serialize.PlaySound(1, 'c24'))
             } else {
@@ -272,7 +272,10 @@ module.exports = class RescueMode {
         else {
             switch (this.state) {
                 case STATE_NIGHT:
-                    self.send(Serialize.SystemMessage('<color=red>밤에 대화할 수 없는 직업입니다.</color>'))
+                    if (self.game.job !== JobType.MAFIA && self.game.job !== JobType.SPY && self.game.job !== JobType.BITCH)
+                        this.broadcastToMafia(Serialize.ChatMessage(self.type, self.index, `<color=#C90000>${self.name}</color>`, message))
+                    else
+                        self.send(Serialize.SystemMessage('<color=red>밤에 대화할 수 없는 직업입니다.</color>'))
                     break
                 case STATE_LAST_DITCH:
                     if (self !== this.target) {
@@ -366,6 +369,8 @@ module.exports = class RescueMode {
             JobType.POLICE,
             JobType.DOCTOR
         ]
+        if (this.room.users.length >= 7)
+            this.jobs.push(JobType.MAFIA)
         this.subJobs = [
             JobType.ARMY,
             JobType.LAWYER,
@@ -520,11 +525,14 @@ module.exports = class RescueMode {
         let target = null
         const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA)
         if (mafias.length > 0) {
-            const mafia = mafias[0]
+            const rand = Math.floor(Math.random() * mafias.length)
+            const mafia = mafias[rand]
             if (mafia) {
                 if (mafia.game.target) {
                     target = mafia.game.target
                     if (target.game.job === JobType.ARMY && target.game.life > 0) {
+                        self.send(Serialize.SystemMessage('<color=red>앗!! 이런 젠장... 방탄복 때문에 군인을 죽일 수 없었다.</color>'))
+                        target.send(Serialize.SystemMessage('<color=red>방탄복 덕분에 마피아의 총격으로부터 보호를 받았다!!</color>'))
                         target.game.life = 0
                         target = null
                     }
@@ -641,6 +649,13 @@ module.exports = class RescueMode {
                     break
             }
             blue.send(Serialize.ResultGame(winner, rank, persons, mission, exp, coin))
+        }
+    }
+
+    broadcastToMafia(data) {
+        for (const user of this.room.users) {
+            if (user.game.team === TeamType.MAFIA)
+                user.send(data)
         }
     }
 
