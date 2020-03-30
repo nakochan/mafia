@@ -554,11 +554,11 @@ module.exports = class RescueMode {
                     thief.game.job = target.game.job
                     if (thief.game.job === JobType.ARMY)
                         thief.game.life = 1
-                    thief.send(Serialize.SetGameTeam(thief))
-                    thief.send(Serialize.UpdateModeInfo(thief.game.job))
                 } else {
                     thief.game.job = JobType.CITIZEN
                 }
+                thief.send(Serialize.SetGameTeam(thief))
+                thief.send(Serialize.UpdateModeInfo(thief.game.job))
                 thief.send(Serialize.SystemMessage('<color=red>직업이 변했습니다!</color>'))
             }
         }
