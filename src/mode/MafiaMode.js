@@ -224,6 +224,8 @@ module.exports = class RescueMode {
             switch (this.state) {
                 case STATE_NIGHT:
                     selfHide = userHide = true
+                    if (self.game.job === JobType.CITIZEN)
+                        userHide = false
                     break
                 case STATE_LAST_DITCH:
                     selfNameHide = userNameHide = true
@@ -231,9 +233,12 @@ module.exports = class RescueMode {
                         selfNameHide = false
                     if (user === this.target)
                         userNameHide = false
+                    if (self.game.dead && !user.game.dead)
+                        selfHide = true
+                    break
                 default:
-                    if (!self.game.dead && user.game.dead)
-                        userHide = true
+                    if (self.game.dead && !user.game.dead)
+                        selfHide = true
                     break
             }
             if (!userHide)

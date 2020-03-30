@@ -104,12 +104,16 @@ class OtherSelfState {
         const target = User.getByUserIndex(context.owner)
         if (!target)
             return
-        if (self.game.target || self.game.dead || target.game.dead)
+        if (self.game.target || self.game.dead)
             return
-        if (self.game.JobType === JobType.DEFAULT || self.game.JobType === JobType.CITIZEN || target.game.JobType === JobType.MAFIA)
+        if (target.game.dead)
+            return self.send(Serialize.NoticeMessage('죽은 사람은 대상으로 설정할 수 없습니다.'))
+        if (self.game.JobType === JobType.DEFAULT || self.game.JobType === JobType.CITIZEN)
             return
-        if (self.game.JobType !== JobType.DOCTOR && self === target)
-            return
+        if (self.game.JobType === JobType.MAFIA && self === target)
+            return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
+        if (self.game.JobType === JobType.POLICE && self === target)
+            return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
         self.game.target = target
         self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
     }
