@@ -10,8 +10,19 @@ const JobType = {
     CITIZEN: 2,
     POLICE: 3,
     DOCTOR: 4,
-    ARMY: 5,
-    LAWYER: 6
+    SPY: 5,
+    ARMY: 6,
+    LAWYER: 7,
+    GANGSTER: 8,
+    SHAMAN: 9,
+    BITCH: 10,
+    COUPLE: 11,
+    DETECTIVE: 12,
+    TERRORIST: 13,
+    THIEF: 14,
+    KILLER: 15,
+    SPIRIT: 16,
+    BUS_DRIVER: 17
 }
 
 const RoomType = {

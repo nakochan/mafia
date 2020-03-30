@@ -49,6 +49,7 @@ module.exports = {
         'ADD_NOTICE_MESSAGE',
         'ADD_USER_REPORT',
         'USE_ITEM',
-        'SELECT_VOTE'
+        'SELECT_VOTE',
+        'SET_GAME_TIME'
     )
 }

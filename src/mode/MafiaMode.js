@@ -56,6 +56,7 @@ module.exports = class RescueMode {
             count: 0,
             vote: 0,
             target: null,
+            time: false,
             dead: false,
             result: false
         }
@@ -154,7 +155,6 @@ module.exports = class RescueMode {
             self.send(Serialize.PlaySound(1, 'c24'))
         } else {
             if (self.game.job === JobType.CITIZEN) {
-                self.setGraphics(this.pureGraphics)
                 switch (self.pick) {
                     case 1:
                         self.teleport(3, 7, 6, 0, -1)
@@ -187,6 +187,7 @@ module.exports = class RescueMode {
                         self.teleport(12, 7, 6, 0, -1)
                         break
                 }
+                self.setGraphics(this.pureGraphics)
                 self.send(Serialize.ToggleInput(false))
                 self.send(Serialize.PlaySound(1, 'c24'))
             } else {
@@ -253,10 +254,6 @@ module.exports = class RescueMode {
                     if (self.game.dead && !user.game.dead)
                         selfHide = true
                     break
-                default:
-                    if (self.game.dead && !user.game.dead)
-                        selfNameHide = true
-                    break
             }
             if (!userHide)
                 self.send(Serialize.CreateGameObject(user, userNameHide))
@@ -267,7 +264,7 @@ module.exports = class RescueMode {
 
     gameChat(self, message) {
         if (self.game.dead)
-            this.room.broadcastToDead(Serialize.ChatMessage(self.type, self.index, `<color=#808080>[사망] ${self.name}</color>`, message))
+            this.room.broadcastToDead(self, Serialize.ChatMessage(self.type, self.index, `<color=#808080>[관전] ${self.name}</color>`, message))
         else {
             switch (this.state) {
                 case STATE_NIGHT:
@@ -284,7 +281,7 @@ module.exports = class RescueMode {
                         break
                     }
                 default:
-                    this.room.publish(Serialize.ChatMessage(self.type, self.index, `<color=#00A2E8>${self.name}</color>`, message))
+                    this.room.publish(Serialize.ChatMessage(self.type, self.index, self.name, message))
                     break
             }
         }
@@ -296,6 +293,24 @@ module.exports = class RescueMode {
 
     useItem(self) {
         return true
+    }
+
+    setGameTime(self, active) {
+        if (self.game.dead)
+            return
+        if (this.state !== STATE_DAY)
+            return self.send(Serialize.SystemMessage('<color=red>낮에만 사용할 수 있습니다.</color>'))
+        if (!this.game.time)
+            return self.send(Serialize.SystemMessage('<color=red>오늘은 이미 사용했습니다. 날이 지난 후 다시 사용하세요.</color>'))
+        if (active) {
+            this.count += 15
+            this.game.time = false
+            this.room.publish(Serialize.SystemMessage(`<color=red>${self.name}님이 시간 연장을 사용했습니다.</color>`))
+        } else {
+            this.count -= 15
+            this.game.time = false
+            this.room.publish(Serialize.SystemMessage(`<color=red>${self.name}님이 시간 단축을 사용했습니다.</color>`))
+        }
     }
 
     selectVote(self, index) {
@@ -368,6 +383,13 @@ module.exports = class RescueMode {
                     user.game.team = TeamType.MAFIA
                 }
                 user.game.job = job
+            } else if (this.subJobs.length > 0) {
+                const rand = Math.floor(Math.random() * this.subJobs.length)
+                const subJobs = this.subJobs[rand]
+                this.subJobs.splice(this.subJobs.indexOf(job), 1)
+                user.game.job = subJobs
+                if (subJobs === JobType.ARMY)
+                    user.game.life = 1
             } else
                 user.game.job = JobType.CITIZEN
             user.send(Serialize.SetGameTeam(user))
@@ -384,6 +406,7 @@ module.exports = class RescueMode {
         for (const user of this.room.users) {
             user.game.count = 0
             user.game.vote = 0
+            user.game.time = true
             if (!user.game.dead)
                 user.setGraphics(user.pureGraphics)
             user.send(Serialize.NoticeMessage(this.days + '째날 아침이 밝았습니다...'))
@@ -445,14 +468,16 @@ module.exports = class RescueMode {
         if (dieCount > saveCount) {
             if (this.target.game.job === JobType.MAFIA)
                 this.room.publish(Serialize.SystemMessage('<color=red>마피아를 찾아냈습니다!!!</color>'))
-            else
+            if (this.target.game.job === JobType.LAWYER) {
+                this.room.publish(Serialize.SystemMessage('<color=red>변호사를 사형 집행을 할 수 없습니다.</color>'))
+                return this.deathPenalty()
+            } else
                 this.room.publish(Serialize.SystemMessage('<color=red>선량한 시민이 죽었습니다...</color>'))
             this.target.game.dead = true
             this.target.setGraphics(this.target.deadGraphics)
-            this.room.publish(Serialize.PlaySound(2, 'Scream'))
+            this.room.publish(Serialize.PlaySound(2, 'strangulation'))
             this.removeSignAndOtherSelf(this.target)
         }
-        this.target = null
         this.deathPenalty()
     }
 
@@ -484,8 +509,13 @@ module.exports = class RescueMode {
         if (mafias.length > 0) {
             const mafia = mafias[0]
             if (mafia) {
-                if (mafia.game.target)
+                if (mafia.game.target) {
                     target = mafia.game.target
+                    if (target.game.job === JobType.ARMY && target.game.life > 0) {
+                        target.game.life = 0
+                        target = null
+                    }
+                }
             }
         }
         const doctors = this.onlyLivingUser().filter(user => user.game.job === JobType.DOCTOR)
@@ -603,8 +633,10 @@ module.exports = class RescueMode {
                         this.checkNight()
                     break
                 case STATE_SUSPECT:
-                    if (this.count === 0)
+                    if (this.count === 0) {
+                        this.target = null
                         this.suspect()
+                    }
                     break
                 case STATE_LAST_DITCH:
                     if (this.count === 0)

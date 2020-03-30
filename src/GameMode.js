@@ -42,7 +42,7 @@ module.exports = class GameMode {
     }
 
     gameChat(self, message) {
-        this.room.publish(Serialize.ChatMessage(self.type, self.index, `<color=#00A2E8>${self.name}</color>`, message))
+        this.room.publish(Serialize.ChatMessage(self.type, self.index, self.name, message))
     }
 
     hit(self, target) {
@@ -52,6 +52,10 @@ module.exports = class GameMode {
     useItem(self) {
         return true
     }
+
+    setGameTime(self, active) { }
+
+    selectVote(self, index) { }
 
     doAction(self, event) {
         event.doAction(self)

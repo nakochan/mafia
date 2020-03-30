@@ -745,8 +745,15 @@ global.User = (function () {
                 this.send(Serialize.MessageGame('REQUEST_REPORT_SUCCESS'))
         }
 
+        setGameTime(active) {
+            if (!this.roomId)
+                return
+            Room.get(this.roomId).setGameTime(this, active)
+        }
+
         selectVote(index) {
-            if (!this.roomId) return
+            if (!this.roomId)
+                return
             Room.get(this.roomId).selectVote(this, index)
         }
 

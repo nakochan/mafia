@@ -273,6 +273,8 @@ module.exports = class Server {
             user.selectVote(int32[0])
         }
 
+        handler[ToServer.SET_GAME_TIME] = async data => user.setGameTime(data[0])
+
         return handler
     }
 

@@ -110,18 +110,22 @@ class OtherSelfState {
             return self.send(Serialize.NoticeMessage('죽은 사람은 대상으로 설정할 수 없습니다.'))
         if (self.game.job === JobType.DEFAULT || self.game.job === JobType.CITIZEN)
             return
-        if (self.game.job === JobType.MAFIA && self === target)
+        if ((self.game.job === JobType.MAFIA || self.game.JobType === JobType.POLICE) && self === target)
             return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
-        if (self.game.JobType === JobType.POLICE && self === target)
-            return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
-        if (self.game.job === JobType.POLICE) {
+        self.game.target = target
+        self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
+        if (self.game.job === JobType.MAFIA) {
+            if (target.game.job === JobType.ARMY && target.game.life > 0) {
+                self.send(Serialize.SystemMessage('<color=red>앗!! 이런 젠장... 방탄복 때문에 군인을 죽일 수 없었다.</color>'))
+                target.send(Serialize.SystemMessage('<color=red>방탄복 덕분에 마피아의 총격으로부터 보호를 받았다!!</color>'))
+            }
+            room.publish(Serialize.PlaySound(2, 'Gun'))
+        } else if (self.game.job === JobType.POLICE) {
             if (target.game.job === JobType.MAFIA)
                 self.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아입니다.</color>'))
             else
                 self.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아가 아닙니다.</color>'))
         }
-        self.game.target = target
-        self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
     }
 
     update(context) { }

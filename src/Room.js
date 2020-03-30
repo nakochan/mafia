@@ -220,6 +220,10 @@ global.Room = (function () {
             this.mode.useItem(self)
         }
 
+        setGameTime(self, active) {
+            this.mode.setGameTime(self, active)
+        }
+
         selectVote(self, index) {
             this.mode.selectVote(self, index)
         }
