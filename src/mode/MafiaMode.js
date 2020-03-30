@@ -375,7 +375,7 @@ module.exports = class RescueMode {
         ]
         if (this.room.users.length >= 5)
             this.jobs.push(JobType.SPY)
-        if (this.room.users.length >= 7)
+        if (this.room.users.length >= 8)
             this.jobs.push(JobType.MAFIA)
         this.subJobs = [
             JobType.ARMY,
@@ -509,6 +509,9 @@ module.exports = class RescueMode {
         console.log("death")
         this.count = 2
         this.state = STATE_DEATH_PENALTY
+        const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
+        if (mafias < 1)
+            return this.result(TeamType.CITIZEN)
         const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
         const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
         if (mafiaTeam >= citizenTeam)
@@ -585,6 +588,9 @@ module.exports = class RescueMode {
         } else {
             this.room.publish(Serialize.SystemMessage('<color=red>지난 밤에는 아무도 죽지 않았습니다.</color>'))
         }
+        const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
+        if (mafias < 1)
+            return this.result(TeamType.CITIZEN)
         const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
         const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
         if (mafiaTeam >= citizenTeam)
