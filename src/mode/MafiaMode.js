@@ -418,7 +418,7 @@ module.exports = class RescueMode {
 
     day() {
         console.log("day")
-        this.count = 30
+        this.count = 90
         this.state = STATE_DAY
         ++this.days
         for (const user of this.room.users) {
@@ -660,7 +660,7 @@ module.exports = class RescueMode {
 
     broadcastToMafia(data) {
         for (const user of this.room.users) {
-            if (user.game.team === TeamType.MAFIA)
+            if (user.game.job === JobType.MAFIA || (user.game.job === JobType.SPY && user.game.touch) || (user.game.job === JobType.BITCH && user.game.touch))
                 user.send(data)
         }
     }
