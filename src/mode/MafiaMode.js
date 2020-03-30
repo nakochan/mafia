@@ -300,15 +300,15 @@ module.exports = class RescueMode {
             return
         if (this.state !== STATE_DAY)
             return self.send(Serialize.SystemMessage('<color=red>낮에만 사용할 수 있습니다.</color>'))
-        if (!this.game.time)
+        if (!self.game.time)
             return self.send(Serialize.SystemMessage('<color=red>오늘은 이미 사용했습니다. 날이 지난 후 다시 사용하세요.</color>'))
         if (active) {
             this.count += 15
-            this.game.time = false
+            self.game.time = false
             this.room.publish(Serialize.SystemMessage(`<color=red>${self.name}님이 시간 연장을 사용했습니다.</color>`))
         } else {
             this.count -= 15
-            this.game.time = false
+            self.game.time = false
             this.room.publish(Serialize.SystemMessage(`<color=red>${self.name}님이 시간 단축을 사용했습니다.</color>`))
         }
     }
