@@ -386,7 +386,7 @@ module.exports = class RescueMode {
             } else if (this.subJobs.length > 0) {
                 const rand = Math.floor(Math.random() * this.subJobs.length)
                 const subJobs = this.subJobs[rand]
-                this.subJobs.splice(this.subJobs.indexOf(job), 1)
+                this.subJobs.splice(this.subJobs.indexOf(subJobs), 1)
                 user.game.job = subJobs
                 if (subJobs === JobType.ARMY)
                     user.game.life = 1
