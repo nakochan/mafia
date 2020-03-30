@@ -106,9 +106,9 @@ class OtherSelfState {
             return
         if (self.game.target || self.game.dead)
             return
-        if (self.game.job === JobType.SPIRIT && target.game.dead)
+        if (self.game.job === JobType.SPIRIT && !target.game.dead)
             return self.send(Serialize.NoticeMessage('산 사람을 대상으로 설정할 수 없습니다.'))
-        if (self.game.job !== JobType.SPIRIT && !target.game.dead)
+        if (self.game.job !== JobType.SPIRIT && target.game.dead)
             return self.send(Serialize.NoticeMessage('죽은 사람을 대상으로 설정할 수 없습니다.'))
         if (self.game.job === JobType.DEFAULT || self.game.job === JobType.CITIZEN)
             return
