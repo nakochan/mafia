@@ -215,6 +215,8 @@ module.exports = class RescueMode {
                     if (self.game.job === JobType.CITIZEN)
                         hide = true
                     break
+                default:
+                    break
             }
             if (!hide)
                 self.send(Serialize.CreateGameObject(event))
@@ -233,8 +235,8 @@ module.exports = class RescueMode {
             switch (this.state) {
                 case STATE_NIGHT:
                     selfHide = userHide = true
-                    if (self.game.job === JobType.CITIZEN)
-                        userHide = false
+                    if (self.game.job !== JobType.CITIZEN && user.game.job === JobType.CITIZEN)
+                        selfHide = false
                     break
                 case STATE_LAST_DITCH:
                     selfNameHide = userNameHide = true
