@@ -170,8 +170,9 @@ class ObstacleState {
 
     doAction(context, self) {
         const room = Room.get(context.roomId)
-        if (!room) return
-        self.publishToMap(Serialize.PlaySound(this.moveSound))
+        if (!room)
+            return
+        self.publishToMap(Serialize.PlaySound(2, this.moveSound))
         if (room.isPassable(self.place, context.x + self.direction.x, context.y - self.direction.y, self.direction, true))
             context.move(self.direction.x, -self.direction.y)
         else
