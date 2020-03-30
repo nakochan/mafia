@@ -112,8 +112,8 @@ class OtherSelfState {
             return
         if (self.game.JobType === JobType.MAFIA && self === target)
             return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
-        if (self.game.JobType === JobType.POLICE && self === target)
-            return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
+        //if (self.game.JobType === JobType.POLICE && self === target)
+        //    return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
         console.log("A")
         if (self.game.JobType === JobType.POLICE) {
             console.log("B")
@@ -121,6 +121,9 @@ class OtherSelfState {
                 self.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아입니다.</color>'))
             else
                 self.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아가 아닙니다.</color>'))
+        } else {
+            console.log(self.game.JobType)
+            console.log("?????")
         }
         console.log("C")
         self.game.target = target

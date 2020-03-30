@@ -188,23 +188,23 @@ module.exports = class RescueMode {
                         break
                 }
                 self.send(Serialize.ToggleInput(false))
-                self.send(Serialize.PlaySound(1, 'n14'))
+                self.send(Serialize.PlaySound(1, 'c24'))
             } else {
                 switch (self.game.job) {
                     case JobType.MAFIA:
-                        self.send(Serialize.NoticeMessage('죽일 사람의 집에 찾아가 공격 버튼을 클릭하세요...'))
+                        self.send(Serialize.SystemMessage('<color=red>죽일 사람의 집에 찾아가 공격 버튼을 클릭하세요...</color>'))
                         break
                     case JobType.POLICE:
-                        self.send(Serialize.NoticeMessage('마피아인지 조사할 사람의 집에 찾아가 공격 버튼을 클릭하세요...'))
+                        self.send(Serialize.SystemMessage('<color=red>마피아인지 조사할 사람의 집에 찾아가 공격 버튼을 클릭하세요...</color>'))
                         break
                     case JobType.DOCTOR:
-                        self.send(Serialize.NoticeMessage('살릴 사람의 집에 찾아가 공격 버튼을 클릭하세요...'))
+                        self.send(Serialize.SystemMessage('<color=red>살릴 사람의 집에 찾아가 공격 버튼을 클릭하세요...</color>'))
                         break
                 }
                 self.game.target = null
                 self.setGraphics('Shadow')
                 self.teleport(2, 24, 14)
-                self.send(Serialize.PlaySound(1, 'c24'))
+                self.send(Serialize.PlaySound(1, 'n14'))
             }
         }
         self.send(Serialize.SwitchLight(true))
@@ -279,8 +279,10 @@ module.exports = class RescueMode {
                         break
                     }
                 case STATE_DEATH_PENALTY:
-                    self.send(Serialize.SystemMessage('<color=red>지금은 대화할 수 없습니다.</color>'))
-                    break
+                    if (self !== this.target) {
+                        self.send(Serialize.SystemMessage('<color=red>최후의 변론자만 대화할 수 있습니다.</color>'))
+                        break
+                    }
                 default:
                     this.room.publish(Serialize.ChatMessage(self.type, self.index, `<color=#00A2E8>${self.name}</color>`, message))
                     break
