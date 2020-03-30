@@ -58,6 +58,7 @@ module.exports = class RescueMode {
             vote: 0,
             target: null,
             cling: null,
+            suspect: null,
             time: false,
             touch: false,
             threat: false,
@@ -260,8 +261,19 @@ module.exports = class RescueMode {
                 case STATE_NIGHT:
                     selfHide = userHide = true
                     selfNameHide = userNameHide = true
-                    if (self.game.job !== JobType.CITIZEN && user.game.job === JobType.CITIZEN)
+                    if (!(self.game.job === JobType.CITIZEN
+                        || self.game.job === JobType.ARMY
+                        || self.game.job === JobType.LAWYER
+                        || self.game.job === JobType.THIEF
+                        || (self.game.job === JobType.SHAMAN && self.game.life < 1))
+                        && (user.game.job === JobType.CITIZEN
+                            || user.game.job === JobType.ARMY
+                            || user.game.job === JobType.LAWYER
+                            || user.game.job === JobType.THIEF
+                            || (user.game.job === JobType.SHAMAN && user.game.life < 1)))
                         selfHide = false
+                    if (self.game.job === JobType.SPY && user.game.job === JobType.ARMY)
+                        selfNameHide = false
                     break
                 case STATE_LAST_DITCH:
                     selfNameHide = userNameHide = true
@@ -546,11 +558,13 @@ module.exports = class RescueMode {
     checkNight() {
         console.log("checkNight")
         let target = null
+        let mafiaCling = null
         const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA)
         if (mafias.length > 0) {
             const rand = Math.floor(Math.random() * mafias.length)
             const mafia = mafias[rand]
             if (mafia) {
+                mafiaCling = mafia
                 if (mafia.game.target) {
                     target = mafia.game.target
                     if (target.game.job === JobType.ARMY && target.game.life > 0) {
@@ -604,8 +618,8 @@ module.exports = class RescueMode {
                 const shaman = shamans[0]
                 if (shaman) {
                     if (shaman.game.cling && shaman.game.days >= this.days + 1) {
-                        const jobName = ["", "마피아", "시민", "경찰", "의사", "간첩", "군인", "변호사", "조폭", "무당", "매춘부", "연인", "탐정", "테러리스트", "도둑", "살인마", "영매", "버스기사"]
-                        shaman.send(Serialize.SystemMessage('<color=red>' + shaman.game.cling.name + '님의 직업은 ' + jobName[shaman.game.cling.game.job] + '입니다.</color>'))
+                        if (shaman.game.cling.game.suspect)
+                            shaman.send(Serialize.SystemMessage('<color=red>' + shaman.game.cling.name + '님을 죽인 마피아는 ' + shaman.game.cling.game.suspect.name + '입니다.</color>'))
                     }
                 }
             }

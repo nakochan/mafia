@@ -123,8 +123,10 @@ class OtherSelfState {
         const jobName = ["", "마피아", "시민", "경찰", "의사", "간첩", "군인", "변호사", "조폭", "무당", "매춘부", "연인", "탐정", "테러리스트", "도둑", "살인마", "영매", "버스기사"]
         self.game.target = target
         self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
-        if (self.game.job === JobType.MAFIA)
+        if (self.game.job === JobType.MAFIA) {
+            target.game.suspect = self
             room.publish(Serialize.PlaySound(2, 'Gun'))
+        }
         if (self.game.job === JobType.POLICE) {
             if (target.game.job === JobType.MAFIA)
                 self.send(Serialize.SystemMessage('<color=red>' + target.name + '님은 마피아입니다.</color>'))
@@ -139,7 +141,7 @@ class OtherSelfState {
             self.send(Serialize.SystemMessage('<color=red>' + target.name + '님의 직업은 ' + jobName[target.game.job] + '입니다.</color>'))
         }
         if (self.game.job === JobType.SHAMAN) {
-            self.game.days = room.mode.days + 3
+            self.game.days = room.mode.days + 1
             self.game.life = 0
             self.game.cling = target
             self.send(Serialize.SystemMessage('<color=red>살을 날렸으므로, 3일 후 마피아인지 아닌지 결과가 나오게 됩니다.</color>'))
