@@ -537,7 +537,7 @@ module.exports = class RescueMode {
                 if (mafia.game.target) {
                     target = mafia.game.target
                     if (target.game.job === JobType.ARMY && target.game.life > 0) {
-                        self.send(Serialize.SystemMessage('<color=red>앗!! 이런 젠장... 방탄복 때문에 군인을 죽일 수 없었다.</color>'))
+                        mafia.send(Serialize.SystemMessage('<color=red>앗!! 이런 젠장... 방탄복 때문에 군인을 죽일 수 없었다.</color>'))
                         target.send(Serialize.SystemMessage('<color=red>방탄복 덕분에 마피아의 총격으로부터 보호를 받았다!!</color>'))
                         target.game.life = 0
                         target = null
