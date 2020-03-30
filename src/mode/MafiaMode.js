@@ -375,7 +375,7 @@ module.exports = class RescueMode {
             JobType.POLICE,
             JobType.DOCTOR
         ]
-        if (this.room.users.length >= 5)
+        if (this.room.users.length >= 6)
             this.jobs.push(JobType.SPY)
         if (this.room.users.length >= 8)
             this.jobs.push(JobType.MAFIA)
@@ -420,7 +420,7 @@ module.exports = class RescueMode {
 
     day() {
         console.log("day")
-        this.count = 90
+        this.count = this.days > 1 ? 90 : 30
         this.state = STATE_DAY
         ++this.days
         for (const user of this.room.users) {
