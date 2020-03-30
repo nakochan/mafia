@@ -116,6 +116,7 @@ class OtherSelfState {
             return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
         if (self.game.job === JobType.MAFIA && target.game.job === JobType.MAFIA)
             return self.send(Serialize.NoticeMessage('같은 마피아 직업은 살해할 수 없습니다.'))
+        const jobName = ["", "마피아", "시민", "경찰", "의사", "간첩", "군인", "변호사", "조폭", "무당", "매춘부", "연인", "탐정", "테러리스트", "도둑", "살인마", "영매", "버스기사"]
         self.game.target = target
         self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
         if (self.game.job === JobType.MAFIA)
@@ -131,12 +132,22 @@ class OtherSelfState {
         if (self.game.job === JobType.SPIRIT) {
             if (room.mode.days <= 1)
                 return self.send(Serialize.SystemMessage('<color=red>두번째 날부터 직업을 알아낼 수 있습니다.</color>'))
-            const jobName = ["", "마피아", "시민", "경찰", "의사", "간첩", "군인", "변호사", "조폭", "무당", "매춘부", "연인", "탐정", "테러리스트", "도둑", "살인마", "영매", "버스기사"]
             self.send(Serialize.SystemMessage('<color=red>' + target.name + '님의 직업은 ' + jobName[target.game.job] + '입니다.</color>'))
         }
         if (self.game.job === JobType.GANGSTER)
             target.game.threat = true
-
+        if (self.game.job === JobType.SPY) {
+            if (self.game.touch) {
+                self.send(Serialize.SystemMessage('<color=red>' + target.name + '님의 직업은 ' + jobName[target.game.job] + '입니다.</color>'))
+            } else {
+                if (target.game.job === JobType.MAFIA) {
+                    self.game.touch = true
+                    self.send(Serialize.NoticeMessage('<color=red>마피아와 밤에 채팅이 가능하며 다음 밤부터 직업 조사가 가능합니다.</color>'))
+                    room.mode.broadcastToMafia(Serialize.NoticeMessage(`<color=red>${self.name}님께서 접선에 성공했습니다.</color>`))
+                } else
+                    self.send(Serialize.NoticeMessage('<color=red>마피아가 아닙니다...</color>'))
+            }
+        }
     }
 
     update(context) { }

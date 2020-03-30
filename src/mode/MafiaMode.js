@@ -57,6 +57,7 @@ module.exports = class RescueMode {
             vote: 0,
             target: null,
             time: false,
+            touch: false,
             threat: false,
             dead: false,
             result: false
@@ -155,7 +156,7 @@ module.exports = class RescueMode {
             self.teleport(2, 24, 14)
             self.send(Serialize.PlaySound(1, 'c24'))
         } else {
-            if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER || self.game.job === JobType.THIEF) {
+            if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER || self.game.job === JobType.THIEF || (self.game.job === JobType.SPY && self.game.touch)) {
                 self.setGraphics(this.pureGraphics)
                 switch (self.pick) {
                     case 1:
@@ -205,6 +206,9 @@ module.exports = class RescueMode {
                     case JobType.SPIRIT:
                         self.send(Serialize.SystemMessage('<color=red>원하는 사람에게 찾아가 공격 버튼을 클릭하여 직업을 알아보세요...</color>'))
                         break
+                    case JobType.SPY:
+                        self.send(Serialize.SystemMessage('<color=red>마피아를 찾아 접선을 시도하고 마피아팀과 합류하세요...</color>'))
+                        break
                 }
                 self.game.target = null
                 self.setGraphics('Shadow')
@@ -222,7 +226,7 @@ module.exports = class RescueMode {
             let hide = false
             switch (this.state) {
                 case STATE_NIGHT:
-                    if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER || self.game.job === JobType.THIEF)
+                    if (self.game.job === JobType.CITIZEN || self.game.job === JobType.ARMY || self.game.job === JobType.LAWYER || self.game.job === JobType.THIEF || (self.game.job === JobType.SPY && self.game.touch))
                         hide = true
                     break
                 default:
@@ -272,10 +276,10 @@ module.exports = class RescueMode {
         else {
             switch (this.state) {
                 case STATE_NIGHT:
-                    if (self.game.job === JobType.MAFIA || self.game.job === JobType.SPY || self.game.job === JobType.BITCH)
+                    if (self.game.job === JobType.MAFIA || (self.game.job === JobType.SPY && self.game.touch) || (self.game.job === JobType.BITCH && self.game.touch))
                         this.broadcastToMafia(Serialize.ChatMessage(self.type, self.index, `<color=#C90000>${self.name}</color>`, message))
                     else
-                        self.send(Serialize.SystemMessage('<color=red>밤에 대화할 수 없는 직업입니다.</color>'))
+                        self.send(Serialize.SystemMessage('<color=red>밤에 대화할 수 없습니다.</color>'))
                     break
                 case STATE_LAST_DITCH:
                     if (self !== this.target) {
@@ -369,6 +373,8 @@ module.exports = class RescueMode {
             JobType.POLICE,
             JobType.DOCTOR
         ]
+        if (this.room.users.length >= 5)
+            this.jobs.push(JobType.SPY)
         if (this.room.users.length >= 7)
             this.jobs.push(JobType.MAFIA)
         this.subJobs = [
@@ -486,7 +492,7 @@ module.exports = class RescueMode {
         if (dieCount > saveCount) {
             if (this.target.game.job === JobType.MAFIA)
                 this.room.publish(Serialize.SystemMessage('<color=red>마피아를 찾아냈습니다!!!</color>'))
-            if (this.target.game.job === JobType.LAWYER) {
+            else if (this.target.game.job === JobType.LAWYER) {
                 this.room.publish(Serialize.SystemMessage('<color=red>변호사를 사형 집행을 할 수 없습니다.</color>'))
                 return this.deathPenalty()
             } else
