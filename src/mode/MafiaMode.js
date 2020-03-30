@@ -208,8 +208,17 @@ module.exports = class RescueMode {
 
     drawEvents(self) {
         const { events } = this.room.places[self.place]
-        for (const event of events)
-            self.send(Serialize.CreateGameObject(event))
+        for (const event of events) {
+            let hide = false
+            switch (this.state) {
+                case STATE_NIGHT:
+                    if (self.game.job === JobType.CITIZEN)
+                        hide = true
+                    break
+            }
+            if (!hide)
+                self.send(Serialize.CreateGameObject(event))
+        }
     }
 
     drawUsers(self) {
