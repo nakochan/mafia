@@ -233,6 +233,7 @@ global.Room = (function () {
             this.addUser(self)
             this.mode.join(self)
             this.publish(Serialize.UpdateRoomUserCount(this.users.length))
+            console.log(this.index + " 방 인덱스")
             self.send(Serialize.GetRoomInfo(this, self.pick))
         }
 

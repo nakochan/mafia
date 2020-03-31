@@ -90,7 +90,7 @@ module.exports = class RescueMode {
                 })
                 this.room.addEvent(sign)
                 this.room.publish(Serialize.CreateGameObject(sign))
-                const OTHER_SELF_MAP = [3, 4, 5, 6, 7, 8, 9, 10]
+                const OTHER_SELF_MAP = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
                 const OTHER_SELF_X = [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
                 const OTHER_SELF_Y = [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
                 const otherSelf = new Event(this.roomId, {
