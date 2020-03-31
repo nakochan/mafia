@@ -55,7 +55,7 @@ module.exports = class RescueMode {
             days: 0,
             life: 0,
             count: 0,
-            vote: 0,
+            vote: null,
             target: null,
             cling: null,
             suspect: null,
@@ -163,6 +163,7 @@ module.exports = class RescueMode {
                 || self.game.job === JobType.ARMY
                 || self.game.job === JobType.LAWYER
                 || self.game.job === JobType.THIEF
+                || self.game.job === JobType.TERRORIST
                 || (self.game.job === JobType.SHAMAN && self.game.life < 1)) {
                 self.setGraphics(this.pureGraphics)
                 switch (self.pick) {
@@ -237,6 +238,7 @@ module.exports = class RescueMode {
                         || self.game.job === JobType.ARMY
                         || self.game.job === JobType.LAWYER
                         || self.game.job === JobType.THIEF
+                        || self.game.job === JobType.TERRORIST
                         || (self.game.job === JobType.SHAMAN && self.game.life < 1))
                         hide = true
                     break
@@ -265,11 +267,13 @@ module.exports = class RescueMode {
                         || self.game.job === JobType.ARMY
                         || self.game.job === JobType.LAWYER
                         || self.game.job === JobType.THIEF
+                        || self.game.job === JobType.TERRORIST
                         || (self.game.job === JobType.SHAMAN && self.game.life < 1))
                         && (user.game.job === JobType.CITIZEN
                             || user.game.job === JobType.ARMY
                             || user.game.job === JobType.LAWYER
                             || user.game.job === JobType.THIEF
+                            || user.game.job === JobType.TERRORIST
                             || (user.game.job === JobType.SHAMAN && user.game.life < 1)))
                         selfHide = false
                     if (self.game.job === JobType.SPY && user.game.job === JobType.ARMY)
@@ -350,7 +354,7 @@ module.exports = class RescueMode {
     }
 
     selectVote(self, index) {
-        if (self.game.dead || self.game.vote > 0)
+        if (self.game.dead || self.game.vote)
             return
         const findIndex = this.room.users.findIndex(user => user.index === index)
         if (findIndex < 0)
@@ -358,9 +362,9 @@ module.exports = class RescueMode {
         const user = this.room.users[findIndex]
         if (!user)
             return
-        if (self.game.vote === user.index)
+        if (self.game.vote === user)
             return
-        self.game.vote = user.index
+        self.game.vote = user
         user.game.count += self.game.job === JobType.LAWYER ? 2 : 1
         this.room.publish(Serialize.SetUpVote(user))
     }
@@ -408,7 +412,8 @@ module.exports = class RescueMode {
             JobType.THIEF,
             JobType.SPIRIT,
             JobType.GANGSTER,
-            JobType.SHAMAN
+            JobType.SHAMAN,
+            JobType.TERRORIST
         ]
         this.supply()
     }
@@ -450,7 +455,7 @@ module.exports = class RescueMode {
         ++this.days
         for (const user of this.room.users) {
             user.game.count = 0
-            user.game.vote = 0
+            user.game.vote = null
             user.game.time = true
             if (!user.game.dead)
                 user.setGraphics(user.pureGraphics)
@@ -522,6 +527,19 @@ module.exports = class RescueMode {
             else if (this.target.game.job === JobType.LAWYER) {
                 this.room.publish(Serialize.SystemMessage('<color=red>변호사를 사형 집행을 할 수 없습니다.</color>'))
                 return this.deathPenalty()
+            } else if (this.target.game.job === JobType.TERRORIST) {
+                this.room.publish(Serialize.SystemMessage('<color=red>그는 테러리스트였다...! 으아악. 모두 피해!!!</color>'))
+                this.room.publish(Serialize.PlaySound(2, 'Explode'))
+                const terror = this.target.game.vote
+                if (terror) {
+                    if (terror !== this.target) {
+                        terror.game.dead = true
+                        terror.setGraphics(terror.deadGraphics)
+                        this.room.publish(Serialize.SystemMessage(`<color=red>테러리스트에 의해 ${terror.name}님도 같이 사망했습니다...</color>`))
+                        this.room.publish(Serialize.PlaySound(2, 'scream1'))
+                        this.removeSignAndOtherSelf(terror)
+                    }
+                }
             } else
                 this.room.publish(Serialize.SystemMessage('<color=red>선량한 시민이 죽었습니다...</color>'))
             this.target.game.dead = true
