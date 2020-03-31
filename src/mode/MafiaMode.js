@@ -632,12 +632,21 @@ module.exports = class RescueMode {
             this.room.publish(Serialize.SystemMessage('<color=red>마피아에 의해 ' + target.name + '님이 사망했습니다...</color>'))
             this.room.publish(Serialize.PlaySound(2, 'Scream'))
             const shamans = this.onlyLivingUser().filter(user => user.game.job === JobType.SHAMAN)
+            console.log("A")
             if (shamans.length > 0) {
+                console.log("B")
                 const shaman = shamans[0]
                 if (shaman) {
+                    console.log("C")
+                    console.log(shaman.game.days)
+                    console.log(this.days + 1)
                     if (shaman.game.cling && shaman.game.days >= this.days + 1) {
-                        if (shaman.game.cling.game.suspect)
+                        console.log("D")
+                        console.log(shaman.game.cling)
+                        if (shaman.game.cling.game.suspect) {
                             shaman.send(Serialize.SystemMessage('<color=red>' + shaman.game.cling.name + '님을 죽인 마피아는 ' + shaman.game.cling.game.suspect.name + '입니다.</color>'))
+                            console.log("E")
+                        }
                     }
                 }
             }
