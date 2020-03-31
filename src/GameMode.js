@@ -42,7 +42,7 @@ module.exports = class GameMode {
     }
 
     gameChat(self, message) {
-        this.room.publish(Serialize.ChatMessage(self.type, self.index, self.name, message))
+        this.room.publish(Serialize.ChatMessage(self.type, self.index, `${self.pick}. ${self.name}`, message))
     }
 
     hit(self, target) {
