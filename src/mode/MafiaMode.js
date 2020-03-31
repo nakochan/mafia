@@ -477,6 +477,7 @@ module.exports = class RescueMode {
                 user.send(Serialize.GetVote(this.onlyLivingUser()))
         }
         this.room.publish(Serialize.ModeData(this))
+        self.send(Serialize.PlaySound(1, 'kyuutai'))
     }
 
     suspect() {
