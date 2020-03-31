@@ -263,12 +263,12 @@ module.exports = class RescueMode {
                 case STATE_NIGHT:
                     selfHide = userHide = true
                     selfNameHide = userNameHide = true
-                    if (!(self.game.job === JobType.CITIZEN
-                        || self.game.job === JobType.ARMY
-                        || self.game.job === JobType.LAWYER
-                        || self.game.job === JobType.THIEF
-                        || self.game.job === JobType.TERRORIST
-                        || (self.game.job === JobType.SHAMAN && self.game.life < 1))
+                    if ((self.game.job === JobType.MAFIA
+                        || self.game.job === JobType.SPY
+                        || self.game.job === JobType.POLICE
+                        || self.game.job === JobType.DOCTOR
+                        || self.game.job === JobType.SPIRIT
+                        || self.game.job === JobType.GANGSTER)
                         && (user.game.job === JobType.CITIZEN
                             || user.game.job === JobType.ARMY
                             || user.game.job === JobType.LAWYER

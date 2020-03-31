@@ -108,11 +108,11 @@ global.Room = (function () {
         addUser(user) {
             user.roomId = this.index
             for (let i = 0; i < this.max; i++) {
-                if (this.picks[i] == null) {
-                    this.picks[i] = user.index
-                    user.pick = i + 1
-                    break
-                }
+                if (this.picks[i])
+                    continue
+                this.picks[i] = user.index
+                user.pick = i + 1
+                break
             }
             this.users.push(user)
             this.places[user.place].addUser(user)
