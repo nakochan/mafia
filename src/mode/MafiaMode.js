@@ -346,6 +346,7 @@ module.exports = class RescueMode {
             self.game.time = false
             this.room.publish(Serialize.SystemMessage(`<color=red>${self.name}님이 시간 단축을 사용했습니다.</color>`))
         }
+        this.room.publish(Serialize.PlaySound(2, 'system10'))
     }
 
     selectVote(self, index) {
@@ -540,7 +541,8 @@ module.exports = class RescueMode {
             return this.result(TeamType.CITIZEN)
         const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
         const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
-        if (mafiaTeam >= citizenTeam)
+        const lawyerPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.LAWYER).length
+        if (mafiaTeam >= citizenTeam + lawyerPersons)
             return this.result(TeamType.MAFIA)
         else if (mafiaTeam < 1)
             return this.result(TeamType.CITIZEN)
@@ -558,13 +560,11 @@ module.exports = class RescueMode {
     checkNight() {
         console.log("checkNight")
         let target = null
-        let mafiaCling = null
-        const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA)
+        const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA && user.game.target)
         if (mafias.length > 0) {
             const rand = Math.floor(Math.random() * mafias.length)
             const mafia = mafias[rand]
             if (mafia) {
-                mafiaCling = mafia
                 if (mafia.game.target) {
                     target = mafia.game.target
                     if (target.game.job === JobType.ARMY && target.game.life > 0) {
@@ -583,9 +583,9 @@ module.exports = class RescueMode {
                 if (doctor.game.target) {
                     if (target === doctor.game.target) {
                         if (doctor === target)
-                            this.room.publish(Serialize.SystemMessage('의사는 죽음을 매우 두려워 했습니다...'))
+                            this.room.publish(Serialize.SystemMessage('<color=#BCE55C>의사는 죽음을 매우 두려워 했습니다...</color>'))
                         else
-                            this.room.publish(Serialize.SystemMessage('현명한 의사 덕에 ' + target.name + '님이 기적적으로 살아났습니다!'))
+                            this.room.publish(Serialize.SystemMessage('<color=#BCE55C>현명한 의사 덕에 ' + target.name + '님이 기적적으로 살아났습니다!</color>'))
                         target = null
                     }
                 }
@@ -624,14 +624,15 @@ module.exports = class RescueMode {
                 }
             }
         } else {
-            this.room.publish(Serialize.SystemMessage('<color=red>지난 밤에는 아무도 죽지 않았습니다.</color>'))
+            this.room.publish(Serialize.SystemMessage('<color=#BCE55C>지난 밤에는 아무도 죽지 않았습니다.</color>'))
         }
         const mafiaPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
         if (mafiaPersons < 1)
             return this.result(TeamType.CITIZEN)
         const mafiaTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.MAFIA).length
         const citizenTeam = this.onlyLivingUser().filter(user => user.game.team === TeamType.CITIZEN).length
-        if (mafiaTeam >= citizenTeam)
+        const lawyerPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.LAWYER).length
+        if (mafiaTeam >= citizenTeam + lawyerPersons)
             return this.result(TeamType.MAFIA)
         else if (mafiaTeam < 1)
             return this.result(TeamType.CITIZEN)
