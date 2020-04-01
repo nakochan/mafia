@@ -201,7 +201,6 @@ module.exports = class RescueMode {
                         self.teleport(12, 7, 6, 0, -1)
                         break
                 }
-                self.send(Serialize.ToggleInput(false))
                 self.send(Serialize.PlaySound(1, 'c24'))
             } else {
                 switch (self.game.job) {
