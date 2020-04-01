@@ -1,6 +1,5 @@
 const Router = require('koa-router')
 const request = require('request')
-const base64url = require('base64url')
 const convert = require('xml-js')
 const Serialize = require('../protocol/Serialize')
 const router = new Router()
