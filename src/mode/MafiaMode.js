@@ -177,7 +177,7 @@ module.exports = class RescueMode {
                         self.teleport(4, 7, 6, 0, -1)
                         break
                     case 3:
-                        self.teleport(5, 7, 6, 0, -1)
+                        self.teleport(5, 15, 6, 0, -1)
                         break
                     case 4:
                         self.teleport(6, 7, 6, 0, -1)
@@ -511,11 +511,11 @@ module.exports = class RescueMode {
             if (user.game.threat)
                 user.game.threat = false
             if (this.target === user)
-                user.teleport(13, 10, 7)
+                user.teleport(13, 10, 5)
             else {
                 if (!user.game.dead)
                     user.setGraphics('Shadow')
-                user.teleport(13, 10, 13)
+                user.teleport(13, 10, 12)
             }
         }
         this.room.publish(Serialize.ModeData(this))
