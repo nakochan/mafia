@@ -115,8 +115,10 @@ module.exports = class RescueMode {
         }
         this.moveToDay(self)
         self.publishToMap(Serialize.SetGameTeam(self))
-        self.send(Serialize.UpdateModeInfo(self.game.job))
-        self.publish(Serialize.ModeData(this))
+        self.send(Serialize.UpdateModeInfo(self.game.job, this))
+        self.send(Serialize.ModeData(this))
+        self.send(Serialize.ToggleHit(false))
+        self.send(Serialize.ToggleTime(false))
     }
 
     leave(self) {
@@ -136,7 +138,7 @@ module.exports = class RescueMode {
     }
 
     removeSignAndOtherSelf(self) {
-        for (let i = 1; i <= config.MAP_COUNT; ++i) {
+        for (let i = 1; i <= config.MAP_COUNT; i++) {
             const { events } = this.room.places[i]
             const event = events.filter(e => e.owner === self.index)
             if (event)
@@ -150,8 +152,9 @@ module.exports = class RescueMode {
         else
             self.teleport(1, 24, 14)
         self.send(Serialize.SwitchLight(false))
-        self.send(Serialize.ToggleInput(true))
+        self.send(Serialize.ToggleTime(true))
         self.send(Serialize.PlaySound(1, 'hospital'))
+        self.send(Serialize.UpdateModeInfo(self.game.job, this))
     }
 
     moveToNight(self) {
@@ -222,10 +225,12 @@ module.exports = class RescueMode {
                 self.setGraphics('Shadow')
                 self.teleport(2, 24, 14)
                 self.send(Serialize.PlaySound(1, 'n14'))
+                self.send(Serialize.ToggleHit(true))
             }
         }
         self.send(Serialize.SwitchLight(true))
         self.send(Serialize.NoticeMessage('밤이 되었습니다.'))
+        self.send(Serialize.UpdateModeInfo(self.game.job, this))
     }
 
     drawEvents(self) {
@@ -351,6 +356,7 @@ module.exports = class RescueMode {
             this.room.publish(Serialize.SystemMessage(`<color=red>${self.name}님이 시간 단축을 사용했습니다.</color>`))
         }
         this.room.publish(Serialize.PlaySound(2, 'system10'))
+        this.room.publish(Serialize.ModeData(this))
     }
 
     selectVote(self, index) {
@@ -443,7 +449,7 @@ module.exports = class RescueMode {
             } else
                 user.game.job = JobType.CITIZEN
             user.send(Serialize.SetGameTeam(user))
-            user.send(Serialize.UpdateModeInfo(user.game.job))
+            user.send(Serialize.UpdateModeInfo(user.game.job, this))
         }
         this.day()
     }
@@ -476,6 +482,7 @@ module.exports = class RescueMode {
             else
                 user.send(Serialize.GetVote(this.onlyLivingUser()))
         }
+        this.room.publish(Serialize.ToggleTime(false))
         this.room.publish(Serialize.ModeData(this))
         this.room.publish(Serialize.PlaySound(1, 'kyuutai'))
     }
@@ -520,7 +527,7 @@ module.exports = class RescueMode {
         this.state = STATE_VOTE
         if (this.target === null)
             return this.night()
-        let dieCount = this.onlyLivingUser().filter(user => user.x <= 10).length
+        let dieCount = this.onlyLivingUser().filter(user => user.x < 10).length
         let saveCount = this.onlyLivingUser().length - dieCount
         if (dieCount > saveCount) {
             if (this.target.game.job === JobType.MAFIA)
@@ -622,7 +629,6 @@ module.exports = class RescueMode {
                     thief.game.job = JobType.CITIZEN
                 }
                 thief.send(Serialize.SetGameTeam(thief))
-                thief.send(Serialize.UpdateModeInfo(thief.game.job))
                 thief.send(Serialize.SystemMessage('<color=red>직업이 변했습니다!</color>'))
             }
         }
@@ -654,6 +660,7 @@ module.exports = class RescueMode {
         } else {
             this.room.publish(Serialize.SystemMessage('<color=#BCE55C>지난 밤에는 아무도 죽지 않았습니다.</color>'))
         }
+        this.room.publish(Serialize.ToggleHit(false))
         const mafiaPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
         if (mafiaPersons < 1)
             return this.result(TeamType.CITIZEN)

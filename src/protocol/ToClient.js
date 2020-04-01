@@ -56,6 +56,7 @@ module.exports = {
         'GET_VOTE',
         'SET_UP_VOTE',
         'CLOSE_VOTE',
-        'TOGGLE_INPUT'
+        'TOGGLE_HIT',
+        'TOGGLE_TIME'
     )
 }

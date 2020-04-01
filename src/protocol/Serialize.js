@@ -145,10 +145,12 @@ my.UpdateRoomUserCount = function (count) {
     return JSON.stringify(packet)
 }
 
-my.UpdateModeInfo = function (index) {
+my.UpdateModeInfo = function (index, mode) {
     const packet = {}
     packet._head = ToClient.UPDATE_MODE_INFO
     packet.index = parseInt(index)
+    packet.days = mode.days
+    packet.isNight = mode.state === 2
     return JSON.stringify(packet)
 }
 
@@ -294,9 +296,16 @@ my.SwitchLight = function (active) {
     return JSON.stringify(packet)
 }
 
-my.ToggleInput = function (active) {
+my.ToggleHit = function (active) {
     const packet = {}
-    packet._head = ToClient.TOGGLE_INPUT
+    packet._head = ToClient.TOGGLE_HIT
+    packet.active = active
+    return JSON.stringify(packet)
+}
+
+my.ToggleTime = function (active) {
+    const packet = {}
+    packet._head = ToClient.TOGGLE_TIME
     packet.active = active
     return JSON.stringify(packet)
 }
@@ -542,6 +551,15 @@ my.SetUpVote = function (user) {
 my.CloseVote = function () {
     const packet = {}
     packet._head = ToClient.CLOSE_VOTE
+    return JSON.stringify(packet)
+}
+
+my.SetMuteVoiceChat = function (user, mute = false) {
+    const packet = {}
+    packet._head = ToClient.SET_MUTE_VOICE_CHAT
+    packet.index = user.index
+    packet.roomId = user.roomId
+    packet.mute = mute
     return JSON.stringify(packet)
 }
 
