@@ -116,9 +116,9 @@ class OtherSelfState {
             return
         if (self.game.job === JobType.DEFAULT || self.game.job === JobType.CITIZEN)
             return
-        if ((self.game.job === JobType.MAFIA || self.game.JobType === JobType.POLICE || self.game.JobType === JobType.SPIRIT || self.game.JobType === JobType.GANGSTER) && self === target)
+        if ((self.game.job === JobType.MAFIA || self.game.job === JobType.POLICE || self.game.job === JobType.SPIRIT || self.game.job === JobType.GANGSTER) && self === target)
             return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
-        if (self.game.JobType === JobType.DOCTOR && room.mode.days >= 2 && self === target)
+        if (self.game.job === JobType.DOCTOR && room.mode.days >= 2 && self === target)
             return self.send(Serialize.NoticeMessage('두 번째 날부터는 자기 자신을 치료할 수 없습니다.'))
         if (self.game.job === JobType.MAFIA && target.game.job === JobType.MAFIA)
             return self.send(Serialize.NoticeMessage('같은 마피아 직업은 살해할 수 없습니다.'))
