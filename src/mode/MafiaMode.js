@@ -150,12 +150,12 @@ module.exports = class RescueMode {
     }
 
     moveToDay(self) {
+        self.send(Serialize.SwitchLight(false))
+        self.send(Serialize.ToggleTime(true))
         if (self.game.dead)
             self.teleport(1, 24, 24)
         else
             self.teleport(1, 24, 14)
-        self.send(Serialize.SwitchLight(false))
-        self.send(Serialize.ToggleTime(true))
         self.send(Serialize.PlaySound(1, 'hospital'))
         self.send(Serialize.UpdateModeInfo(self.game.job, this))
     }
