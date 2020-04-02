@@ -91,7 +91,7 @@ module.exports = class RescueMode {
                 this.room.addEvent(sign)
                 this.room.publish(Serialize.CreateGameObject(sign))
                 const OTHER_SELF_MAP = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-                const OTHER_SELF_X = [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+                const OTHER_SELF_X = [7, 7, 15, 7, 7, 7, 7, 7, 7, 7]
                 const OTHER_SELF_Y = [6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
                 const otherSelf = new Event(this.roomId, {
                     "name": self.pick + ". " + self.name,
@@ -119,6 +119,8 @@ module.exports = class RescueMode {
         self.send(Serialize.ModeData(this))
         self.send(Serialize.ToggleHit(false))
         self.send(Serialize.ToggleTime(false))
+        self.send(Serialize.GetUserJobMemo(this.room.users))
+        this.room.broadcast(self, Serialize.SetUpUserJobMemo(self))
     }
 
     leave(self) {
@@ -135,6 +137,7 @@ module.exports = class RescueMode {
         self.game = {}
         self.setGraphics(self.pureGraphics)
         this.removeSignAndOtherSelf(self)
+        this.room.publish(Serialize.RemoveUserJobMemo(self.pick))
     }
 
     removeSignAndOtherSelf(self) {
@@ -450,12 +453,12 @@ module.exports = class RescueMode {
             user.send(Serialize.SetGameTeam(user))
             user.send(Serialize.UpdateModeInfo(user.game.job, this))
         }
-        this.day()
+        this.night()
     }
 
     day() {
         console.log("day")
-        this.count = this.days > 1 ? 90 : 30
+        this.count = 90
         this.state = STATE_DAY
         ++this.days
         for (const user of this.room.users) {

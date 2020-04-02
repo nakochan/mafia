@@ -50,6 +50,7 @@ module.exports = {
         'ADD_USER_REPORT',
         'USE_ITEM',
         'SELECT_VOTE',
-        'SET_GAME_TIME'
+        'SET_GAME_TIME',
+        'GET_USER_JOB_MEMO'
     )
 }

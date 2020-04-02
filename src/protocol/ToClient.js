@@ -57,6 +57,9 @@ module.exports = {
         'SET_UP_VOTE',
         'CLOSE_VOTE',
         'TOGGLE_HIT',
-        'TOGGLE_TIME'
+        'TOGGLE_TIME',
+        'GET_USER_JOB_MEMO',
+        'SET_UP_USER_JOB_MEMO',
+        'REMOVE_USER_JOB_MEMO'
     )
 }

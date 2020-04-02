@@ -1005,6 +1005,13 @@ global.User = (function () {
             Room.get(this.roomId).useItem(this)
         }
 
+        getUserJobMemo() {
+            if (!this.roomId)
+                return
+            const room = Room.get(this.roomId)
+            this.send(Serialize.GetUserJobMemo(room.users))
+        }
+
         portal(place, x, y, dx = 0, dy = 0) {
             this.timestamp = 0
             this.broadcastToMap(Serialize.RemoveGameObject(this))

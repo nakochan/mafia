@@ -563,6 +563,33 @@ my.SetMuteVoiceChat = function (user, mute = false) {
     return JSON.stringify(packet)
 }
 
+my.GetUserJobMemo = function (users = []) {
+    const packet = {}
+    packet._head = ToClient.GET_USER_JOB_MEMO
+    packet.users = users.map(u => ({
+        index: u.index,
+        pick: u.pick,
+        name: u.name
+    }))
+    return JSON.stringify(packet)
+}
+
+my.SetUpUserJobMemo = function (user) {
+    const packet = {}
+    packet._head = ToClient.SET_UP_USER_JOB_MEMO
+    packet.index = user.index
+    packet.pick = user.pick
+    packet.name = user.name
+    return JSON.stringify(packet)
+}
+
+my.RemoveUserJobMemo = function (pick) {
+    const packet = {}
+    packet._head = ToClient.REMOVE_USER_JOB_MEMO
+    packet.pick = pick
+    return
+}
+
 module.exports = {
     ...my
 }

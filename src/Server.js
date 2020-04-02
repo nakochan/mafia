@@ -275,6 +275,8 @@ module.exports = class Server {
 
         handler[ToServer.SET_GAME_TIME] = async data => user.setGameTime(data[0])
 
+        handler[ToServer.GET_USER_JOB_MEMO] = async () => user.getUserJobMemo()
+
         return handler
     }
 
