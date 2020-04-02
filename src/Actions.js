@@ -118,6 +118,8 @@ class OtherSelfState {
             return
         if ((self.game.job === JobType.MAFIA || self.game.JobType === JobType.POLICE || self.game.JobType === JobType.SPIRIT || self.game.JobType === JobType.GANGSTER) && self === target)
             return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
+        if (self.game.JobType === JobType.DOCTOR && room.mode.days >= 2 && self === target)
+            return self.send(Serialize.NoticeMessage('두 번째 날부터는 자기 자신을 치료할 수 없습니다.'))
         if (self.game.job === JobType.MAFIA && target.game.job === JobType.MAFIA)
             return self.send(Serialize.NoticeMessage('같은 마피아 직업은 살해할 수 없습니다.'))
         const jobName = ["", "마피아", "시민", "경찰", "의사", "간첩", "군인", "변호사", "조폭", "무당", "매춘부", "연인", "탐정", "테러리스트", "도둑", "살인마", "영매", "버스기사"]
