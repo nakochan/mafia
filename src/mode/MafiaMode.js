@@ -430,7 +430,9 @@ module.exports = class RescueMode {
         console.log("ready")
         // this.room.lock = true
         this.init()
-        for (const user of this.room.users) {
+        const slice = this.room.users.slice(0)
+        const users = slice.sort(() => 0.5 - Math.random())
+        for (const user of users) {
             if (this.jobs.length > 0) {
                 const rand = Math.floor(Math.random() * this.jobs.length)
                 const job = this.jobs[rand]
@@ -650,7 +652,7 @@ module.exports = class RescueMode {
                     console.log("C")
                     console.log(shaman.game.days)
                     console.log(this.days + 1)
-                    if (shaman.game.cling && shaman.game.days >= this.days + 1) {
+                    if (shaman.game.cling && shaman.game.days >= this.days + 3) {
                         console.log("D")
                         console.log(shaman.game.cling)
                         if (shaman.game.cling.game.suspect) {
