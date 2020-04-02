@@ -521,7 +521,7 @@ module.exports = class RescueMode {
                 user.teleport(13, 10, 12)
             }
         }
-        this.room.publish(Serialize.SystemMessage('<color=red>살린다 O, 죽인다 X 로 이동하세요.</color>'))
+        this.room.publish(Serialize.SystemMessage('<color=red>죽인다 O, 살린다 X 로 이동하세요.</color>'))
         this.room.publish(Serialize.ModeData(this))
     }
 
@@ -530,9 +530,9 @@ module.exports = class RescueMode {
         this.state = STATE_VOTE
         if (this.target === null)
             return this.night()
-        let dieCount = this.onlyLivingUser().filter(user => user.x > 10).length
-        let saveCount = this.onlyLivingUser().length - dieCount
-        if (dieCount > saveCount) {
+        const saveCount = this.onlyLivingUser().filter(user => user.x > 10).length
+        const dieCount = this.onlyLivingUser().filter(user => user.x < 10).length
+        if (saveCount < dieCount) {
             if (this.target.game.job === JobType.MAFIA)
                 this.room.publish(Serialize.SystemMessage('<color=red>마피아를 찾아냈습니다!!!</color>'))
             else if (this.target.game.job === JobType.LAWYER) {
