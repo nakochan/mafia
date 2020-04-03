@@ -800,7 +800,7 @@ global.User = (function () {
             const room = Room.get(this.roomId)
             if (!room)
                 return
-            message = message.substring(0, 35).replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            message = message.substring(0, 100).replace(/</g, '&lt;').replace(/>/g, '&gt;')
             const now = new Date().getTime()
             if (this.lastChatTime.getTime() > now)
                 return this.send(Serialize.SystemMessage('<color=red>운영진에 의해 채팅이 금지되었습니다.</color> (' + this.lastChatTime + ')'))

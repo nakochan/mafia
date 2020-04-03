@@ -552,6 +552,7 @@ module.exports = class RescueMode {
                         terror.game.dead = true
                         terror.setGraphics(terror.deadGraphics)
                         this.room.publish(Serialize.SystemMessage(`<color=red>테러리스트에 의해 ${terror.name}님도 같이 사망했습니다...</color>`))
+                        this.room.publish(terror, Serialize.SetUpUserJobMemo(terror))
                         this.room.publish(Serialize.PlaySound(2, 'scream1'))
                         this.removeSignAndOtherSelf(terror)
                     }
@@ -560,6 +561,7 @@ module.exports = class RescueMode {
                 this.room.publish(Serialize.SystemMessage('<color=red>선량한 시민이 죽었습니다...</color>'))
             this.target.game.dead = true
             this.target.setGraphics(this.target.deadGraphics)
+            this.room.publish(this.target, Serialize.SetUpUserJobMemo(this.target))
             this.room.publish(Serialize.PlaySound(2, 'strangulation'))
             this.removeSignAndOtherSelf(this.target)
         }
@@ -645,23 +647,15 @@ module.exports = class RescueMode {
             target.setGraphics(target.deadGraphics)
             this.removeSignAndOtherSelf(target)
             this.room.publish(Serialize.SystemMessage('<color=red>마피아에 의해 ' + target.name + '님이 사망했습니다...</color>'))
+            this.room.publish(target, Serialize.SetUpUserJobMemo(target))
             this.room.publish(Serialize.PlaySound(2, 'Scream'))
             const shamans = this.onlyLivingUser().filter(user => user.game.job === JobType.SHAMAN)
-            console.log("A")
             if (shamans.length > 0) {
-                console.log("B")
                 const shaman = shamans[0]
                 if (shaman) {
-                    console.log("C")
-                    console.log(shaman.game.days)
-                    console.log(this.days + 1)
                     if (shaman.game.cling && shaman.game.days >= this.days + 3) {
-                        console.log("D")
-                        console.log(shaman.game.cling)
-                        if (shaman.game.cling.game.suspect) {
+                        if (shaman.game.cling.game.suspect)
                             shaman.send(Serialize.SystemMessage('<color=red>' + shaman.game.cling.name + '님을 죽인 마피아는 ' + shaman.game.cling.game.suspect.name + '입니다.</color>'))
-                            console.log("E")
-                        }
                     }
                 }
             }
