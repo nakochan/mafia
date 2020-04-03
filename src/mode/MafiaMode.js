@@ -330,7 +330,7 @@ module.exports = class RescueMode {
                         break
                     }
                 default:
-                    this.room.publish(Serialize.ChatMessage(self.type, self.index, `${self.pick}. ${self.name}`, message))
+                    this.room.publish(Serialize.ChatMessage(self.type, self.index, `<color=#99D9EA>${self.pick}. ${self.name}</color>`, message))
                     break
             }
         }
