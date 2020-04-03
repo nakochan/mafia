@@ -154,8 +154,11 @@ module.exports = class RescueMode {
         self.send(Serialize.ToggleTime(true))
         if (self.game.dead)
             self.teleport(1, 24, 24)
-        else
-            self.teleport(1, 24, 14)
+        else {
+            const X = [20, 24, 28, 28, 28, 28, 24, 20, 20, 20]
+            const Y = [14, 14, 14, 16, 18, 20, 20, 20, 18, 16]
+            self.teleport(1, X[self.pick - 1], Y[self.pick - 1])
+        }
         self.send(Serialize.PlaySound(1, 'hospital'))
         self.send(Serialize.UpdateModeInfo(self.game.job, this))
     }
@@ -423,7 +426,7 @@ module.exports = class RescueMode {
             JobType.SHAMAN,
             JobType.TERRORIST
         ]
-        this.supply()
+        // this.supply()
     }
 
     ready() {

@@ -569,7 +569,8 @@ my.GetUserJobMemo = function (users = []) {
     packet.users = users.map(u => ({
         index: u.index,
         pick: u.pick,
-        name: u.name
+        name: u.name,
+        dead: (u.hasOwnProperty('game') && u.game.hasOwnProperty('dead')) ? u.game.dead : false
     }))
     return JSON.stringify(packet)
 }
@@ -580,6 +581,7 @@ my.SetUpUserJobMemo = function (user) {
     packet.index = user.index
     packet.pick = user.pick
     packet.name = user.name
+    packet.dead = (user.hasOwnProperty('game') && user.game.hasOwnProperty('dead')) ? user.game.dead : false
     return JSON.stringify(packet)
 }
 
