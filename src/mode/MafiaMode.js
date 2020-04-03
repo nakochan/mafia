@@ -580,7 +580,7 @@ module.exports = class RescueMode {
         const lawyerPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.LAWYER).length
         if (mafiaTeam >= citizenTeam + lawyerPersons)
             return this.result(TeamType.MAFIA)
-        else if (mafiaTeam < 1)
+        else if (mafiaTeam < lawyerPersons + 1)
             return this.result(TeamType.CITIZEN)
     }
 
@@ -671,7 +671,7 @@ module.exports = class RescueMode {
         const lawyerPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.LAWYER).length
         if (mafiaTeam >= citizenTeam + lawyerPersons)
             return this.result(TeamType.MAFIA)
-        else if (mafiaTeam < 1)
+        else if (mafiaTeam < lawyerPersons + 1)
             return this.result(TeamType.CITIZEN)
         this.day()
     }

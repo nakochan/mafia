@@ -47,10 +47,12 @@ my.ConnectionCount = function (count) {
     return JSON.stringify(packet)
 }
 
-my.SystemMessage = function (message) {
+my.SystemMessage = function (message, color = '') {
     const packet = {}
     packet._head = ToClient.SYSTEM_MESSAGE
     packet.text = message
+    if (color !== '')
+        packet.color = color
     return JSON.stringify(packet)
 }
 

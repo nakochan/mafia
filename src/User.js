@@ -204,7 +204,7 @@ global.User = (function () {
         async createClan(name) {
             if (this.clanId)
                 return
-            if (this.coin < 10000)
+            if (this.coin < 5000)
                 return this.send(Serialize.MessageClan('NOT_ENOUGH_COIN'))
             if (name.length < 1 || name.length > 12)
                 return this.send(Serialize.MessageClan('AN_IMPOSSIBLE_LENGTH'))
@@ -215,7 +215,7 @@ global.User = (function () {
             const clan = await Clan.create(this.id, name)
             if (!clan)
                 return
-            this.coin -= 10000
+            this.coin -= 5000
             this.clan = clan
             let members = []
             for (let i = 0; i < this.clan.members.length; ++i) {
@@ -558,12 +558,12 @@ global.User = (function () {
                     if (this.cash < item.cost * data.days)
                         return this.send(Serialize.MessageShop('NOT_ENOUGH_CASH'))
                     this.setUpCash(-(item.cost * data.days))
-                    if (item.creatorId > 0 && this.id !== item.creatorId) {
+                    /*if (item.creatorId > 0 && this.id !== item.creatorId) {
                         const receiveCash = Math.floor(item.cost / 10)
                         const title = item.name + ' 스킨 구매에 따른 보석 지급 안내'
                         const content = '안녕하세요?<br><br>스킨 공모에 출품하신 <color=red>[' + item.name + ']</color>' + (pix.maker(item.name) ? '를' : '을') + ' <color=red>[' + this.name + ']</color>님께서 구입하셨기 때문에 보석 "' + receiveCash + '개"를 지급해드립니다.<br><br>앞으로도 많은 출품을 부탁드립니다. 감사합니다!'
                         await DB.InsertNoticeMessage(item.creatorId, this.id, title, content, receiveCash)
-                    }
+                    }*/
                 } else {
                     if (this.coin < item.cost * data.days)
                         return this.send(Serialize.MessageShop('NOT_ENOUGH_COIN'))
