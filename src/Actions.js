@@ -44,7 +44,7 @@ class DoorState {
                     }
                 } else self.publishToMap(Serialize.PlaySound(2, this.knockSound))
             }
-        } else self.send(Serialize.InformMessage('<color=red>오니가 철창문을 고장냈다.</color>'))
+        }
     }
 }
 

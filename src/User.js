@@ -812,15 +812,15 @@ global.User = (function () {
             message = message.substring(0, 100).replace(/</g, '&lt;').replace(/>/g, '&gt;')
             const now = new Date().getTime()
             if (this.lastChatTime.getTime() > now)
-                return this.send(Serialize.SystemMessage('<color=red>운영진에 의해 채팅이 금지되었습니다.</color> (' + this.lastChatTime + ')'))
+                return this.send(Serialize.SystemMessage('운영진에 의해 채팅이 금지되었습니다. (' + this.lastChatTime + ')', 'red'))
             let text = message.replace(/[^ㄱ-ㅎ가-힣]/g, '')
             if (!filtering.check(text)) {
                 ++this.alert
-                if (this.alert >= 3)
+                if (this.alert >= 5)
                     this.send(Serialize.QuitGame())
                 else {
                     this.send(Serialize.Vibrate())
-                    this.send(Serialize.SystemMessage('<color=red>금칙어를 언급하여 경고 ' + this.alert + '회를 받았습니다. 3회 이상시 자동 추방됩니다.</color>'))
+                    this.send(Serialize.SystemMessage('금칙어를 언급하여 경고 ' + this.alert + '회를 받았습니다. 5회 이상시 자동 추방됩니다.', 'red'))
                 }
                 return
             }
@@ -828,11 +828,11 @@ global.User = (function () {
                 return
             console.log(this.name + '(#' + this.roomId + '@' + this.place + '): ' + message)
             switch (room.type) {
-                case RoomType.GAME:
-                    this.gameChat(message)
-                    break
                 case RoomType.PLAYGROUND:
                     this.publish(Serialize.ChatMessage(this.type, this.index, this.name, message))
+                    break
+                default:
+                    this.gameChat(message)
                     break
             }
         }
@@ -847,7 +847,7 @@ global.User = (function () {
                         this.setUpCash(-20)
                     }*/
                 } else
-                    this.notice(Serialize.SystemMessage('<color=#EFE4B0>@[' + (this.admin === 1 ? '운영자' : '개발자') + '] ' + this.name + ': ' + message.substring(1) + '</color>'))
+                    this.notice(Serialize.SystemMessage('@[' + (this.admin === 1 ? '운영자' : '개발자') + '] ' + this.name + ': ' + message.substring(1), '#EFE4B0'))
                 return true
             }
             if (this.admin < 1)
@@ -879,7 +879,7 @@ global.User = (function () {
                     if (this.admin < 2)
                         return false
                     if (piece.length <= 1) {
-                        this.send(Serialize.SystemMessage('<color=red>!보석,지급 개수 (1 ~ 10000)</color>'))
+                        this.send(Serialize.SystemMessage('!보석,지급 개수 (1 ~ 10000)', 'red'))
                         return true
                     }
                     cash = Number(piece[1])
@@ -887,12 +887,12 @@ global.User = (function () {
                         cash = 1
                     for (const user of User.users) {
                         user.setUpCash(cash)
-                        user.send(Serialize.SystemMessage('<color=#FFC90E>' + this.name + '님께서 보석 ' + cash + '개를 지급해주셨습니다!!!</color>'))
+                        user.send(Serialize.SystemMessage(this.name + '님께서 보석 ' + cash + '개를 지급해주셨습니다!!!', '#FFC90E>'))
                     }
                     break
                 case '!채금':
                     if (piece.length <= 2) {
-                        this.send(Serialize.SystemMessage('<color=red>!채금,닉네임,일 단위 (1 ~ 3650)</color>'))
+                        this.send(Serialize.SystemMessage('!채금,닉네임,일 단위 (1 ~ 3650)', 'red'))
                         return true
                     }
                     name = piece[1]
@@ -904,14 +904,14 @@ global.User = (function () {
                         const d = new Date()
                         d.setDate(d.getDate() + days)
                         target.lastChatTime = d
-                        target.send(Serialize.SystemMessage('<color=red>클린유저 또는 운영진에 의해 채팅이 금지되었습니다.</color>'))
-                        this.send(Serialize.SystemMessage('<color=red>' + name + (pix.maker(name) ? '를' : '을') + ' ' + days + '일 동안 채팅을 금지함.</color>'))
+                        target.send(Serialize.SystemMessage('클린유저 또는 운영진에 의해 채팅이 금지되었습니다.', 'red'))
+                        this.send(Serialize.SystemMessage(name + (pix.maker(name) ? '를' : '을') + ' ' + days + '일 동안 채팅을 금지함.', 'red'))
                     } else
-                        this.send(Serialize.SystemMessage('<color=red>' + name + (pix.maker(name) ? '는' : '은') + ' 접속하지 않았거나 존재하지 않음.</color>'))
+                        this.send(Serialize.SystemMessage(name + (pix.maker(name) ? '는' : '은') + ' 접속하지 않았거나 존재하지 않음.', 'red'))
                     break
                 case '!채해':
                     if (piece.length <= 1) {
-                        this.send(Serialize.SystemMessage('<color=red>!채해,닉네임</color>'))
+                        this.send(Serialize.SystemMessage('!채해,닉네임', 'red'))
                         return true
                     }
                     name = piece[1]
@@ -919,14 +919,14 @@ global.User = (function () {
                     if (target) {
                         const d = new Date()
                         target.lastChatTime = d
-                        target.send(Serialize.SystemMessage('<color=red>클린유저 또는 운영진에 의해 채팅 금지가 해제되었습니다.</color>'))
-                        this.send(Serialize.SystemMessage('<color=red>' + name + (pix.maker(name) ? '를' : '을') + ' 채팅 금지를 해제함.</color>'))
+                        target.send(Serialize.SystemMessage('클린유저 또는 운영진에 의해 채팅 금지가 해제되었습니다.', 'red'))
+                        this.send(Serialize.SystemMessage(name + (pix.maker(name) ? '를' : '을') + ' 채팅 금지를 해제함.', 'red'))
                     } else
-                        this.send(Serialize.SystemMessage('<color=red>' + name + (pix.maker(name) ? '는' : '은') + ' 접속하지 않았거나 존재하지 않음.</color>'))
+                        this.send(Serialize.SystemMessage(name + (pix.maker(name) ? '는' : '은') + ' 접속하지 않았거나 존재하지 않음.', 'red'))
                     break
                 case '!차단':
                     if (piece.length <= 2) {
-                        this.send(Serialize.SystemMessage('<color=red>!차단,닉네임,욕설 사용,일 단위 (1 ~ 3650)</color>'))
+                        this.send(Serialize.SystemMessage('!차단,닉네임,욕설 사용,일 단위 (1 ~ 3650)', 'red'))
                         return true
                     }
                     name = piece[1]
@@ -938,11 +938,11 @@ global.User = (function () {
                     if (target)
                         this.ban(target, name, description, days)
                     else
-                        this.send(Serialize.ChatMessage(null, null, null, '<color=red>' + name + (pix.maker(name) ? '는' : '은') + ' 접속하지 않았거나 존재하지 않음.</color>'))
+                        this.send(Serialize.ChatMessage(null, null, null, name + (pix.maker(name) ? '는' : '은') + ' 접속하지 않았거나 존재하지 않음.', 'red'))
                     break
                 case '!메모':
                     if (piece.length <= 1) {
-                        this.send(Serialize.SystemMessage('<color=red>!메모,닉네임,내용 (공백시 정보 요청)</color>'))
+                        this.send(Serialize.SystemMessage('!메모,닉네임,내용 (공백시 정보 요청)', 'red'))
                         return true
                     }
                     name = piece[1]
@@ -951,9 +951,9 @@ global.User = (function () {
                     if (target) {
                         if (description !== '')
                             target.memo = description
-                        this.send(Serialize.SystemMessage('<color=#FFC90E>' + name + '#메모: </color>' + target.memo))
+                        this.send(Serialize.SystemMessage(name + '#메모: ' + target.memo, '#FFC90E'))
                     } else
-                        this.send(Serialize.SystemMessage('<color=red>' + name + (pix.maker(name) ? '는' : '은') + ' 접속하지 않았거나 존재하지 않음.</color>'))
+                        this.send(Serialize.SystemMessage(name + (pix.maker(name) ? '는' : '은') + ' 접속하지 않았거나 존재하지 않음.', 'red'))
                     break
                 default:
                     return false
@@ -965,13 +965,13 @@ global.User = (function () {
             if (user) {
                 await DB.InsertBlock(user.verify.loginType, user.verify.id, user.verify.uuid, name, description, days)
                 user.send(Serialize.QuitGame())
-                this.publish(Serialize.SystemMessage('<color=red>' + name + (pix.maker(name) ? '를' : '을') + ' ' + days + '일 동안 접속을 차단함. (' + description + ')</color>'))
+                this.publish(Serialize.SystemMessage(name + (pix.maker(name) ? '를' : '을') + ' ' + days + '일 동안 접속을 차단함. (' + description + ')', 'red'))
                 console.log(name + (pix.maker(name) ? '를' : '을') + ' ' + days + '일 동안 접속을 차단함. (' + description + ')')
             } else {
                 const findUser = await DB.FindUserByName(name)
                 if (findUser) {
                     await DB.InsertBlock(findUser.login_type, findUser.uid, findUser.uuid, name, description, days)
-                    this.publish(Serialize.SystemMessage('<color=red>' + name + (pix.maker(name) ? '를' : '을') + ' ' + days + '일 동안 접속을 차단함. (' + description + ')</color>'))
+                    this.publish(Serialize.SystemMessage(name + (pix.maker(name) ? '를' : '을') + ' ' + days + '일 동안 접속을 차단함. (' + description + ')', 'red'))
                     console.log(name + (pix.maker(name) ? '를' : '을') + ' ' + days + '일 동안 접속을 차단함. (' + description + ')')
                 }
             }

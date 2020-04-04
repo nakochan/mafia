@@ -1,6 +1,7 @@
 const { RoomType } = require('./util/const')
 const Serialize = require('./protocol/Serialize')
 const MafiaMode = require('./mode/MafiaMode')
+const MafiaRankMode = require('./mode/MafiaRankMode')
 
 module.exports = class GameMode {
     constructor(roomId, type) {
@@ -43,7 +44,10 @@ module.exports = class GameMode {
     }
 
     gameChat(self, message) {
-        this.room.publish(Serialize.ChatMessage(self.type, self.index, `${self.pick}. ${self.name}`, message, '#99D9EA'))
+        if (this.type === RoomType.RANK_GAME)
+            this.room.publish(Serialize.ChatMessage(self.type, self.index, `${self.pick}번`, message, '#99D9EA'))
+        else
+            this.room.publish(Serialize.ChatMessage(self.type, self.index, `${self.pick}. ${self.name}`, message, '#99D9EA'))
     }
 
     hit(self, target) {
@@ -54,9 +58,7 @@ module.exports = class GameMode {
         return true
     }
 
-    setTarget(self) {
-
-    }
+    setTarget(self) { }
 
     setGameTime(self, active) { }
 
@@ -68,11 +70,12 @@ module.exports = class GameMode {
     }
 
     update() {
-        const min = this.type === RoomType.RANK_GAME ? 8 : 4
+        const min = this.type === RoomType.RANK_GAME ? 4 : 4
         if (this.room.users.length >= min) {
-            const modes = [MafiaMode]
-            const i = Math.floor(Math.random() * modes.length)
-            return this.room.changeMode(modes[i])
+            if (this.type === RoomType.RANK_GAME)
+                return this.room.changeMode(MafiaRankMode)
+            else
+                return this.room.changeMode(MafiaMode)
         } else {
             if (this.count % 100 === 0)
                 this.room.publish(Serialize.NoticeMessage(min + '명부터 시작합니다. (' + this.room.users.length + '/' + this.room.max + '명)'))
