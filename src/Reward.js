@@ -15,6 +15,8 @@ module.exports = class Reward {
         self.setUpCash(Math.floor(this.cash))
         self.coin += Math.floor(this.coin)
         self.point += Math.floor(this.point)
+        if (self.point < 0)
+            self.point = 0
         this.init()
     }
 }

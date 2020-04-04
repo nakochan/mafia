@@ -32,6 +32,7 @@ global.User = (function () {
             this.id = 0
             this.rank = 0
             this.name = '테스트'
+            this.pureName = this.name
             this.level = 1
             this.exp = 0
             this.maxExp = this.getMaxExp()
@@ -155,6 +156,7 @@ global.User = (function () {
             const rank = Data.rank.find(r => r.id === this.id)
             this.rank = rank ? rank.rank : 0
             this.name = user.name
+            this.pureName = user.name
             this.level = user.level
             this.exp = user.exp
             this.maxExp = this.getMaxExp()
@@ -196,6 +198,7 @@ global.User = (function () {
             if (user)
                 user.name = username
             this.name = username
+            this.pureName = username
             this.setUpCash(-500)
             this.send(Serialize.MessageLobby('CHANGE_USERNAME_SUCCESS'))
             this.send(Serialize.UserData(this))
@@ -743,6 +746,12 @@ global.User = (function () {
                 return this.send(Serialize.MessageGame('ALREADY_RECEIVED'))
             if (await DB.InsertReport(this.id, target.id, type, content))
                 this.send(Serialize.MessageGame('REQUEST_REPORT_SUCCESS'))
+        }
+
+        setTarget() {
+            if (!this.roomId)
+                return
+            Room.get(this.roomId).setTarget(this)
         }
 
         setGameTime(active) {

@@ -1,3 +1,4 @@
+const { RoomType } = require('./util/const')
 const Serialize = require('./protocol/Serialize')
 const MafiaMode = require('./mode/MafiaMode')
 
@@ -15,6 +16,12 @@ module.exports = class GameMode {
     }
 
     join(self) {
+        if (this.type === RoomType.RANK_GAME) {
+            const tempNames = ['김개똥', '석석동', '강강라', '아주박', '순철진', '나동탁', '검준모', '이진창', '영불손', '아간나', '임식봉', '유죽내', '앙선동', '무진라', '아삭개']
+            const i = Math.floor(Math.random() * tempNames.length)
+            self.name = tempNames[i]
+        } else
+            self.name = self.pureName
         self.game = {}
         self.setGraphics(self.pureGraphics)
         this.moveToBase(self)
@@ -53,6 +60,10 @@ module.exports = class GameMode {
         return true
     }
 
+    setTarget(self) {
+
+    }
+
     setGameTime(self, active) { }
 
     selectVote(self, index) { }
@@ -63,13 +74,14 @@ module.exports = class GameMode {
     }
 
     update() {
-        if (this.room.users.length >= 5) {
+        const min = this.type === RoomType.RANK_GAME ? 8 : 4
+        if (this.room.users.length >= min) {
             const modes = [MafiaMode]
             const i = Math.floor(Math.random() * modes.length)
             return this.room.changeMode(modes[i])
         } else {
             if (this.count % 100 === 0)
-                this.room.publish(Serialize.NoticeMessage('5명부터 시작합니다. (' + this.room.users.length + '/' + this.room.max + '명)'))
+                this.room.publish(Serialize.NoticeMessage(min + '명부터 시작합니다. (' + this.room.users.length + '/' + this.room.max + '명)'))
         }
         if (++this.count === 10000)
             this.count = 0

@@ -51,6 +51,7 @@ module.exports = {
         'USE_ITEM',
         'SELECT_VOTE',
         'SET_GAME_TIME',
-        'GET_USER_JOB_MEMO'
+        'GET_USER_JOB_MEMO',
+        'SET_TARGET'
     )
 }

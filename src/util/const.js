@@ -28,6 +28,7 @@ const JobType = {
 const RoomType = {
     PLAYGROUND: 1,
     GAME: 2,
+    RANK_GAME: 3
 }
 
 const MapType = {

@@ -277,6 +277,8 @@ module.exports = class Server {
 
         handler[ToServer.GET_USER_JOB_MEMO] = async () => user.getUserJobMemo()
 
+        handler[ToServer.SET_TARGET] = async () => user.setTarget()
+
         return handler
     }
 

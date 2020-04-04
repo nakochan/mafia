@@ -77,13 +77,15 @@ my.ComboMessage = function (message) {
     return JSON.stringify(packet)
 }
 
-my.ChatMessage = function (type, index, name, text) {
+my.ChatMessage = function (type, index, name, text, color = '') {
     const packet = {}
     packet._head = ToClient.CHAT_MESSAGE
     packet.type = type
     packet.index = index
     packet.name = name
     packet.text = text
+    if (color !== '')
+        packet.color = color
     return JSON.stringify(packet)
 }
 
@@ -267,15 +269,18 @@ my.DeadAnimation = function () {
     return JSON.stringify(packet)
 }
 
-my.ResultGame = function (winner, rank, persons, mission, exp, coin) {
+my.ResultGame = function (winner, users) {
     const packet = {}
     packet._head = ToClient.RESULT_GAME
     packet.winner = winner
-    packet.rank = rank
-    packet.persons = persons
-    packet.mission = mission
-    packet.exp = exp
-    packet.coin = coin
+    packet.users = users.map(u => ({
+        index: u.index,
+        pick: u.pick,
+        name: u.name,
+        clanname: u.clanname || '',
+        //score: (u.hasOwnProperty('score') && u.score.hasOwnProperty('sum')) ? u.score.sum : 0,
+        job: (u.hasOwnProperty('game') && u.game.hasOwnProperty('job')) ? u.game.job : 0
+    }))
     return JSON.stringify(packet)
 }
 
@@ -529,6 +534,7 @@ my.GetRoomInfo = function (room, pick = 0) {
     packet.type = room.type
     packet.name = room.name
     packet.max = room.max
+    packet.voice = room.voice
     return JSON.stringify(packet)
 }
 

@@ -1,6 +1,6 @@
 const Serialize = require('../protocol/Serialize')
 const GameMap = require('../GameMap')
-const { TeamType, JobType, MapType, ModeType } = require('../util/const')
+const { TeamType, JobType, RoomType, MapType, ModeType } = require('../util/const')
 const PlayerState = require('../PlayerState')
 const Event = require('../Event')
 const pix = require('../util/pix')
@@ -22,8 +22,8 @@ module.exports = class RescueMode {
         this.map = MapType.TOWN
         this.mode = ModeType.MAFIA
         this.tick = 0
-        this.count = 20
-        this.maxCount = 20
+        this.count = 30
+        this.maxCount = 30
         this.days = 0
         this.mafiaTeam = []
         this.citizenTeam = []
@@ -102,7 +102,7 @@ module.exports = class RescueMode {
                     "owner": self.index,
                     "collider": true,
                     "action": {
-                        "command": "otherSelf"
+                        "command": ""
                     }
                 })
                 this.room.addEvent(otherSelf)
@@ -211,19 +211,19 @@ module.exports = class RescueMode {
             } else {
                 switch (self.game.job) {
                     case JobType.MAFIA:
-                        self.send(Serialize.SystemMessage('<color=red>죽일 사람의 집에 찾아가 공격 버튼을 클릭하세요...</color>'))
+                        self.send(Serialize.SystemMessage('죽일 사람의 집에 찾아가 공격 버튼을 클릭하세요...', 'red'))
                         break
                     case JobType.POLICE:
-                        self.send(Serialize.SystemMessage('<color=red>마피아인지 조사할 사람의 집에 찾아가 공격 버튼을 클릭하세요...</color>'))
+                        self.send(Serialize.SystemMessage('마피아인지 조사할 사람의 집에 찾아가 공격 버튼을 클릭하세요...', 'red'))
                         break
                     case JobType.DOCTOR:
-                        self.send(Serialize.SystemMessage('<color=red>살릴 사람의 집에 찾아가 공격 버튼을 클릭하세요...</color>'))
+                        self.send(Serialize.SystemMessage('살릴 사람의 집에 찾아가 공격 버튼을 클릭하세요...', 'red'))
                         break
                     case JobType.SPIRIT:
-                        self.send(Serialize.SystemMessage('<color=red>원하는 사람에게 찾아가 공격 버튼을 클릭하여 직업을 알아보세요...</color>'))
+                        self.send(Serialize.SystemMessage('원하는 사람에게 찾아가 공격 버튼을 클릭하여 직업을 알아보세요...', 'red'))
                         break
                     case JobType.SPY:
-                        self.send(Serialize.SystemMessage('<color=red>마피아를 찾아 접선을 시도하고 마피아팀과 합류하세요...</color>'))
+                        self.send(Serialize.SystemMessage('마피아를 찾아 접선을 시도하고 마피아팀과 합류하세요...', 'red'))
                         break
                 }
                 self.game.target = null
@@ -288,6 +288,8 @@ module.exports = class RescueMode {
                         selfHide = false
                     if (self.game.job === JobType.SPY && user.game.job === JobType.ARMY)
                         selfNameHide = false
+                    if (self.game.dead && !user.game.dead)
+                        selfHide = true
                     break
                 case STATE_LAST_DITCH:
                     selfNameHide = userNameHide = true
@@ -295,6 +297,10 @@ module.exports = class RescueMode {
                         selfNameHide = false
                     if (user === this.target)
                         userNameHide = false
+                    if (self.game.dead && !user.game.dead)
+                        selfHide = true
+                    break
+                default:
                     if (self.game.dead && !user.game.dead)
                         selfHide = true
                     break
@@ -308,29 +314,29 @@ module.exports = class RescueMode {
 
     gameChat(self, message) {
         if (self.game.dead)
-            this.broadcastToDead(Serialize.ChatMessage(self.type, self.index, `<color=#808080>[관전] ${self.pick}. ${self.name}</color>`, message))
+            this.broadcastToDead(Serialize.ChatMessage(self.type, self.index, `[관전] ${self.pick}. ${self.name}`, message, '#808080'))
         else {
             switch (this.state) {
                 case STATE_NIGHT:
                     if (self.game.job === JobType.MAFIA || (self.game.job === JobType.SPY && self.game.touch) || (self.game.job === JobType.BITCH && self.game.touch))
-                        this.broadcastToMafia(Serialize.ChatMessage(self.type, self.index, `<color=#C90000>${self.pick}. ${self.name}</color>`, message))
+                        this.broadcastToMafia(Serialize.ChatMessage(self.type, self.index, `${self.pick}. ${self.name}`, message, '#C90000'))
                     else if (self.game.job === JobType.SPIRIT)
-                        this.broadcastToDead(Serialize.ChatMessage(self.type, self.index, `<color=#47C83E>[영매] ${self.pick}. ${self.name}</color>`, message))
+                        this.broadcastToDead(Serialize.ChatMessage(self.type, self.index, `[영매] ${self.pick}. ${self.name}`, message, '#47C83E'))
                     else
-                        self.send(Serialize.SystemMessage('<color=red>밤에 대화할 수 없습니다.</color>'))
+                        self.send(Serialize.SystemMessage('밤에 대화할 수 없습니다.', 'red'))
                     break
                 case STATE_LAST_DITCH:
                     if (self !== this.target) {
-                        self.send(Serialize.SystemMessage('<color=red>최후의 변론자만 대화할 수 있습니다.</color>'))
+                        self.send(Serialize.SystemMessage('최후의 변론자만 대화할 수 있습니다.', 'red'))
                         break
                     }
                 case STATE_DEATH_PENALTY:
                     if (self !== this.target) {
-                        self.send(Serialize.SystemMessage('<color=red>최후의 변론자만 대화할 수 있습니다.</color>'))
+                        self.send(Serialize.SystemMessage('최후의 변론자만 대화할 수 있습니다.', 'red'))
                         break
                     }
                 default:
-                    this.room.publish(Serialize.ChatMessage(self.type, self.index, `<color=#99D9EA>${self.pick}. ${self.name}</color>`, message))
+                    this.room.publish(Serialize.ChatMessage(self.type, self.index, `${self.pick}. ${self.name}`, message, '#99D9EA'))
                     break
             }
         }
@@ -344,21 +350,90 @@ module.exports = class RescueMode {
         return true
     }
 
+    setTarget(self) {
+        if (self.place < 3 || self.place > 12)
+            return
+        const findIndex = this.room.users.findIndex(user => user.pick === self.place - 2)
+        if (findIndex < 0)
+            return
+        const target = this.room.users[findIndex]
+        if (!target)
+            return
+        if (self.game.target || self.game.dead)
+            return
+        if (self.game.job === JobType.SPIRIT && !target.game.dead)
+            return self.send(Serialize.NoticeMessage('산 사람을 대상으로 설정할 수 없습니다.'))
+        if (self.game.job !== JobType.SPIRIT && target.game.dead)
+            return self.send(Serialize.NoticeMessage('죽은 사람을 대상으로 설정할 수 없습니다.'))
+        if (self.game.job === JobType.SHAMAN && target.game.dead)
+            return self.send(Serialize.NoticeMessage('죽은 사람을 대상으로 설정할 수 없습니다.'))
+        if (self.game.job === JobType.SHAMAN && self.game.life < 1)
+            return
+        if (self.game.job === JobType.DEFAULT || self.game.job === JobType.CITIZEN)
+            return
+        if ((self.game.job === JobType.MAFIA || self.game.job === JobType.POLICE || self.game.job === JobType.SPIRIT || self.game.job === JobType.GANGSTER) && self === target)
+            return self.send(Serialize.NoticeMessage('자기 자신은 지정할 수 없습니다.'))
+        if (self.game.job === JobType.DOCTOR && this.days >= 2 && self === target)
+            return self.send(Serialize.NoticeMessage('두 번째 날부터는 자기 자신을 치료할 수 없습니다.'))
+        if (self.game.job === JobType.MAFIA && target.game.job === JobType.MAFIA)
+            return self.send(Serialize.NoticeMessage('같은 마피아 직업은 살해할 수 없습니다.'))
+        const jobName = ["", "마피아", "시민", "경찰", "의사", "간첩", "군인", "변호사", "조폭", "무당", "매춘부", "연인", "탐정", "테러리스트", "도둑", "살인마", "영매", "버스기사"]
+        self.game.target = target
+        self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
+        if (self.game.job === JobType.MAFIA) {
+            target.game.suspect = self
+            room.publish(Serialize.PlaySound(2, 'Gun'))
+        }
+        if (self.game.job === JobType.POLICE) {
+            if (target.game.job === JobType.MAFIA)
+                self.send(Serialize.SystemMessage(target.name + '님은 마피아입니다.', 'red'))
+            else
+                self.send(Serialize.SystemMessage(target.name + '님은 마피아가 아닙니다.', 'red'))
+        }
+        if (self.game.job === JobType.DOCTOR)
+            room.publish(Serialize.PlaySound(2, 'magical21'))
+        if (self.game.job === JobType.SPIRIT) {
+            if (this.days <= 1)
+                return self.send(Serialize.SystemMessage('두번째 날부터 직업을 알아낼 수 있습니다.', 'red'))
+            self.send(Serialize.SystemMessage(target.name + '님의 직업은 ' + jobName[target.game.job] + '입니다.', 'red'))
+        }
+        if (self.game.job === JobType.SHAMAN) {
+            self.game.days = this.days + 1
+            self.game.life = 0
+            self.game.cling = target
+            self.send(Serialize.SystemMessage('살을 날렸으므로, 3일 후 마피아인지 아닌지 결과가 나오게 됩니다.', 'red'))
+        }
+        if (self.game.job === JobType.GANGSTER)
+            target.game.threat = true
+        if (self.game.job === JobType.SPY) {
+            if (self.game.touch) {
+                self.send(Serialize.SystemMessage(target.name + '님의 직업은 ' + jobName[target.game.job] + '입니다.', 'red'))
+            } else {
+                if (target.game.job === JobType.MAFIA) {
+                    self.game.touch = true
+                    self.send(Serialize.SystemMessage('마피아와 밤에 채팅이 가능하며 다음 밤부터 직업 조사가 가능합니다.', 'red'))
+                    this.broadcastToMafia(Serialize.SystemMessage(`${self.name}님께서 접선에 성공했습니다.`, 'red'))
+                } else
+                    self.send(Serialize.SystemMessage('마피아가 아닙니다...', 'red'))
+            }
+        }
+    }
+
     setGameTime(self, active) {
         if (self.game.dead)
             return
         if (this.state !== STATE_DAY)
-            return self.send(Serialize.SystemMessage('<color=red>낮에만 사용할 수 있습니다.</color>'))
+            return self.send(Serialize.SystemMessage('낮에만 사용할 수 있습니다.', 'red'))
         if (!self.game.time)
-            return self.send(Serialize.SystemMessage('<color=red>오늘은 이미 사용했습니다. 날이 지난 후 다시 사용하세요.</color>'))
+            return self.send(Serialize.SystemMessage('오늘은 이미 사용했습니다. 날이 지난 후 다시 사용하세요.', 'red'))
         if (active) {
             this.count += 15
             self.game.time = false
-            this.room.publish(Serialize.SystemMessage(`<color=red>${self.name}님이 시간 연장을 사용했습니다.</color>`))
+            this.room.publish(Serialize.SystemMessage(`${self.name}님이 시간 연장을 사용했습니다.`, 'red'))
         } else {
             this.count -= 15
             self.game.time = false
-            this.room.publish(Serialize.SystemMessage(`<color=red>${self.name}님이 시간 단축을 사용했습니다.</color>`))
+            this.room.publish(Serialize.SystemMessage(`${self.name}님이 시간 단축을 사용했습니다.`, 'red'))
         }
         this.room.publish(Serialize.PlaySound(2, 'system10'))
         this.room.publish(Serialize.ModeData(this))
@@ -430,8 +505,8 @@ module.exports = class RescueMode {
     }
 
     ready() {
-        console.log("ready")
-        // this.room.lock = true
+        if (this.room.type === RoomType.RANK_GAME)
+            this.room.lock = true
         this.init()
         const slice = this.room.users.slice(0)
         const users = slice.sort(() => 0.5 - Math.random())
@@ -462,7 +537,6 @@ module.exports = class RescueMode {
     }
 
     day() {
-        console.log("day")
         this.count = 90
         this.state = STATE_DAY
         ++this.days
@@ -480,12 +554,11 @@ module.exports = class RescueMode {
     }
 
     checkDay() {
-        console.log("checkday")
         this.count = 10
         this.state = STATE_SUSPECT
         for (const user of this.room.users) {
             if (user.game.threat)
-                user.send(Serialize.SystemMessage('<color=red>조폭에게 협박을 당해 낮에 투표할 수 없습니다!!!</color>'))
+                user.send(Serialize.SystemMessage('조폭에게 협박을 당해 낮에 투표할 수 없습니다!!!', 'red'))
             else
                 user.send(Serialize.GetVote(this.onlyLivingUser()))
         }
@@ -495,7 +568,6 @@ module.exports = class RescueMode {
     }
 
     suspect() {
-        console.log("suspect")
         for (const user of this.room.users)
             user.send(Serialize.CloseVote())
         const targets = this.onlyLivingUser().slice(0).sort((a, b) => b.game.count - a.game.count)
@@ -512,7 +584,6 @@ module.exports = class RescueMode {
     }
 
     lastDitch() {
-        console.log("lastDitch")
         this.count = 10
         this.state = STATE_LAST_DITCH
         for (const user of this.room.users) {
@@ -526,12 +597,11 @@ module.exports = class RescueMode {
                 user.teleport(13, 10, 12)
             }
         }
-        this.room.publish(Serialize.SystemMessage('<color=red>죽인다 O, 살린다 X 로 이동하세요.</color>'))
+        this.room.publish(Serialize.SystemMessage('죽인다 O, 살린다 X 로 이동하세요.', 'red'))
         this.room.publish(Serialize.ModeData(this))
     }
 
     vote() {
-        console.log("vote")
         this.state = STATE_VOTE
         if (this.target === null)
             return this.night()
@@ -539,37 +609,37 @@ module.exports = class RescueMode {
         const dieCount = this.onlyLivingUser().filter(user => user.x < 10).length
         if (saveCount < dieCount) {
             if (this.target.game.job === JobType.MAFIA)
-                this.room.publish(Serialize.SystemMessage('<color=red>마피아를 찾아냈습니다!!!</color>'))
+                this.room.publish(Serialize.SystemMessage('마피아를 찾아냈습니다!!!', 'red'))
             else if (this.target.game.job === JobType.LAWYER) {
-                this.room.publish(Serialize.SystemMessage('<color=red>변호사를 사형 집행을 할 수 없습니다.</color>'))
+                this.room.publish(Serialize.SystemMessage('변호사를 사형 집행을 할 수 없습니다.', 'red'))
                 return this.deathPenalty()
             } else if (this.target.game.job === JobType.TERRORIST) {
-                this.room.publish(Serialize.SystemMessage('<color=red>그는 테러리스트였다...! 으아악. 모두 피해!!!</color>'))
+                this.room.publish(Serialize.SystemMessage('그는 테러리스트였다...! 으아악. 모두 피해!!!', 'red'))
                 this.room.publish(Serialize.PlaySound(2, 'Explode'))
                 const terror = this.target.game.vote
                 if (terror) {
                     if (terror !== this.target) {
                         terror.game.dead = true
                         terror.setGraphics(terror.deadGraphics)
-                        this.room.publish(Serialize.SystemMessage(`<color=red>테러리스트에 의해 ${terror.name}님도 같이 사망했습니다...</color>`))
+                        this.room.publish(Serialize.SystemMessage(`테러리스트에 의해 ${terror.name}님도 같이 사망했습니다...`, 'red'))
                         this.room.publish(Serialize.SetUpUserJobMemo(terror))
                         this.room.publish(Serialize.PlaySound(2, 'scream1'))
                         this.removeSignAndOtherSelf(terror)
                     }
                 }
             } else
-                this.room.publish(Serialize.SystemMessage('<color=red>선량한 시민이 죽었습니다...</color>'))
+                this.room.publish(Serialize.SystemMessage('선량한 시민이 죽었습니다...', 'red'))
             this.target.game.dead = true
             this.target.setGraphics(this.target.deadGraphics)
             this.room.publish(Serialize.SetUpUserJobMemo(this.target))
             this.room.publish(Serialize.PlaySound(2, 'strangulation'))
             this.removeSignAndOtherSelf(this.target)
-        }
+        } else
+            this.room.publish(Serialize.SystemMessage('과반수의 반대로 사형을 집행하지 않습니다.', 'red'))
         this.deathPenalty()
     }
 
     deathPenalty() {
-        console.log("death")
         this.count = 2
         this.state = STATE_DEATH_PENALTY
         const mafiaPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
@@ -585,7 +655,6 @@ module.exports = class RescueMode {
     }
 
     night() {
-        console.log("night")
         this.count = 30
         this.state = STATE_NIGHT
         for (const user of this.room.users)
@@ -594,7 +663,6 @@ module.exports = class RescueMode {
     }
 
     checkNight() {
-        console.log("checkNight")
         let target = null
         const mafias = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA && user.game.target)
         if (mafias.length > 0) {
@@ -604,8 +672,8 @@ module.exports = class RescueMode {
                 if (mafia.game.target) {
                     target = mafia.game.target
                     if (target.game.job === JobType.ARMY && target.game.life > 0) {
-                        mafia.send(Serialize.SystemMessage('<color=red>앗!! 이런 젠장... 방탄복 때문에 군인을 죽일 수 없었다.</color>'))
-                        target.send(Serialize.SystemMessage('<color=red>방탄복 덕분에 마피아의 총격으로부터 보호를 받았다!!</color>'))
+                        mafia.send(Serialize.SystemMessage('앗!! 이런 젠장... 방탄복 때문에 군인을 죽일 수 없었다.', 'red'))
+                        target.send(Serialize.SystemMessage('방탄복 덕분에 마피아의 총격으로부터 보호를 받았다!!', 'red'))
                         target.game.life = 0
                         target = null
                     }
@@ -619,9 +687,9 @@ module.exports = class RescueMode {
                 if (doctor.game.target) {
                     if (target === doctor.game.target) {
                         if (doctor === target)
-                            this.room.publish(Serialize.SystemMessage('<color=#BCE55C>의사는 죽음을 매우 두려워 했습니다...</color>'))
+                            this.room.publish(Serialize.SystemMessage('의사는 죽음을 매우 두려워 했습니다...', '#BCE55C'))
                         else
-                            this.room.publish(Serialize.SystemMessage('<color=#BCE55C>현명한 의사 덕에 ' + target.name + '님이 기적적으로 살아났습니다!</color>'))
+                            this.room.publish(Serialize.SystemMessage('현명한 의사 덕에 ' + target.name + '님이 기적적으로 살아났습니다!', '#BCE55C'))
                         target = null
                     }
                 }
@@ -639,14 +707,14 @@ module.exports = class RescueMode {
                     thief.game.job = JobType.CITIZEN
                 }
                 thief.send(Serialize.SetGameTeam(thief))
-                thief.send(Serialize.SystemMessage('<color=red>직업이 변했습니다!</color>'))
+                thief.send(Serialize.SystemMessage('직업이 변했습니다!', 'red'))
             }
         }
         if (target) {
             target.game.dead = true
             target.setGraphics(target.deadGraphics)
             this.removeSignAndOtherSelf(target)
-            this.room.publish(Serialize.SystemMessage('<color=red>마피아에 의해 ' + target.name + '님이 사망했습니다...</color>'))
+            this.room.publish(Serialize.SystemMessage('마피아에 의해 ' + target.name + '님이 사망했습니다...', 'red'))
             this.room.publish(Serialize.SetUpUserJobMemo(target))
             this.room.publish(Serialize.PlaySound(2, 'Scream'))
             const shamans = this.onlyLivingUser().filter(user => user.game.job === JobType.SHAMAN)
@@ -655,12 +723,12 @@ module.exports = class RescueMode {
                 if (shaman) {
                     if (shaman.game.cling && shaman.game.days >= this.days + 3) {
                         if (shaman.game.cling.game.suspect)
-                            shaman.send(Serialize.SystemMessage('<color=red>' + shaman.game.cling.name + '님을 죽인 마피아는 ' + shaman.game.cling.game.suspect.name + '입니다.</color>'))
+                            shaman.send(Serialize.SystemMessage(shaman.game.cling.name + '님을 죽인 마피아는 ' + shaman.game.cling.game.suspect.name + '입니다.', 'red'))
                     }
                 }
             }
         } else {
-            this.room.publish(Serialize.SystemMessage('<color=#BCE55C>지난 밤에는 아무도 죽지 않았습니다.</color>'))
+            this.room.publish(Serialize.SystemMessage('지난 밤에는 아무도 죽지 않았습니다.', '#BCE55C'))
         }
         this.room.publish(Serialize.ToggleHit(false))
         const mafiaPersons = this.onlyLivingUser().filter(user => user.game.job === JobType.MAFIA).length
@@ -690,65 +758,35 @@ module.exports = class RescueMode {
 
     result(winner) {
         this.state = STATE_RESULT
-        const slice = this.room.users.slice(0)
-        for (const user of slice) {
+        const users = this.room.users.slice(0)
+        for (const user of users) {
             user.roomId = 0
             user.game.result = true
         }
         Room.remove(this.room)
-        for (const red of this.mafiaTeam)
-            red.score.sum += 100
-        for (const blue of this.citizenTeam)
-            blue.score.sum += 100
-        const ranks = slice.sort((a, b) => b.score.sum - a.score.sum)
-        const persons = slice.length
-        for (const red of this.mafiaTeam) {
-            const mission = "킬 " + red.score.kill + "\n장농 킬 " + red.score.killForWardrobe
-            let exp = 100 + red.score.sum
-            let coin = 50 + parseInt(red.score.sum / 2)
-            if (exp < 100)
-                exp = 100
-            if (coin < 50)
-                coin = 50
-            const rank = ranks.indexOf(red) + 1
-            red.reward.exp = exp
-            red.reward.coin = coin
-            switch (rank) {
-                case 1:
-                    red.reward.point = 10
-                    break
-                case 2:
-                    red.reward.point = 5
-                    break
-                case 3:
-                    red.reward.point = 1
-                    break
-            }
-            red.send(Serialize.ResultGame(winner, rank, persons, mission, exp, coin))
+        for (const user of users) {
+            user.score.sum += user.game.dead ? 100 : this.days * 50
+            if (winner === user.game.team)
+                user.score += 200
         }
-        for (const blue of this.citizenTeam) {
-            const mission = "구출 " + blue.score.rescue + " (" + blue.score.rescueCombo + "콤보)\n수감 " + (blue.score.death + blue.score.deathForWardrobe)
-            let exp = 100 + blue.score.sum
-            let coin = 50 + parseInt(blue.score.sum / 2)
+        const ranks = users.sort((a, b) => b.score.sum - a.score.sum)
+        for (const user of users) {
+            let exp = 100 + user.score.sum
+            let coin = 50 + parseInt(user.score.sum / 2)
             if (exp < 100)
                 exp = 100
             if (coin < 50)
                 coin = 50
-            const rank = ranks.indexOf(blue) + 1
-            blue.reward.exp = exp
-            blue.reward.coin = coin
-            switch (rank) {
-                case 1:
-                    blue.reward.point = 10
-                    break
-                case 2:
-                    blue.reward.point = 5
-                    break
-                case 3:
-                    blue.reward.point = 1
-                    break
+            const rank = ranks.indexOf(user) + 1
+            user.reward.exp = exp
+            user.reward.coin = coin
+            if (this.room.type === RoomType.RANK_GAME) {
+                if (winner === user.game.team)
+                    user.reward.point = 100
+                else
+                    user.reward.point -= 100
             }
-            blue.send(Serialize.ResultGame(winner, rank, persons, mission, exp, coin))
+            user.send(Serialize.ResultGame(winner, rank, exp, coin, users))
         }
     }
 
@@ -799,7 +837,6 @@ module.exports = class RescueMode {
                     break
             }
             --this.count
-            console.log("count: " + this.count)
         }
     }
 }

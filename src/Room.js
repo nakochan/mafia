@@ -65,7 +65,7 @@ global.Room = (function () {
             return Room.rooms[id]
         }
 
-        constructor(type = RoomType.PLAYGROUND, name = '', max = 10) {
+        constructor(type = RoomType.PLAYGROUND, name = '', max = 10, voice = true) {
             this.index = 0
             this.type = type
             this.name = name
@@ -76,7 +76,8 @@ global.Room = (function () {
                     return target.hasOwnProperty(name) ? target[name] : target[name] = new Place(this.index, name)
                 }
             })
-            this.max = max
+            this.max = type === RoomType.PLAYGROUND ? 128 : max
+            this.voice = type === RoomType.GAME ? voice : false
             this.mode = null
             this.loop = null
             this.isRunning = false
@@ -210,6 +211,10 @@ global.Room = (function () {
 
         useItem(self) {
             this.mode.useItem(self)
+        }
+
+        setTarget(self) {
+            this.mode.setTarget(self)
         }
 
         setGameTime(self, active) {
