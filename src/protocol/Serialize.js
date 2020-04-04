@@ -112,7 +112,7 @@ my.CreateGameObject = function (obj, hide = false, anony = false) {
     packet._head = ToClient.CREATE_GAME_OBJECT
     packet.index = obj.index
     packet.pick = obj.pick || 0
-    packet.clanname = hide ? '' : (obj.clan && obj.clan.name || '')
+    packet.clanname = hide ? '' : (anony ? '' : (obj.clan && obj.clan.name || ''))
     packet.type = obj.type
     packet.name = hide ? '' : (anony ? obj.pick + '번' : obj.name)
     packet.team = (obj.hasOwnProperty('game') && obj.game.hasOwnProperty('team')) ? obj.game.team : TeamType.BLUE
@@ -526,7 +526,7 @@ my.SetAnimation = function (obj, anim, sound = null) {
     return JSON.stringify(packet)
 }
 
-my.GetRoomInfo = function (room, pick = 0, hide = false) {
+my.GetRoomInfo = function (room, pick = 0) {
     const packet = {}
     packet._head = ToClient.GET_ROOM_INFO
     packet.index = room.index
@@ -577,7 +577,7 @@ my.GetUserJobMemo = function (users = [], hide = false) {
     packet.users = users.map(u => ({
         index: u.index,
         pick: u.pick,
-        name: hide ? u.pick + '번' : u.name,
+        name: hide ? (u.pick + '번') : u.name,
         dead: (u.hasOwnProperty('game') && u.game.hasOwnProperty('dead')) ? u.game.dead : false
     }))
     return JSON.stringify(packet)
@@ -588,7 +588,7 @@ my.SetUpUserJobMemo = function (user, hide = false) {
     packet._head = ToClient.SET_UP_USER_JOB_MEMO
     packet.index = user.index
     packet.pick = user.pick
-    packet.name = hide ? user.pick + '번' : user.name
+    packet.name = hide ? (user.pick + '번') : user.name
     packet.dead = (user.hasOwnProperty('game') && user.game.hasOwnProperty('dead')) ? user.game.dead : false
     return JSON.stringify(packet)
 }

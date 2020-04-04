@@ -38,8 +38,8 @@ module.exports = class GameMode {
         for (const user of sameMapUsers) {
             if (self === user)
                 continue
-            user.send(Serialize.CreateGameObject(self))
-            self.send(Serialize.CreateGameObject(user))
+            user.send(Serialize.CreateGameObject(self, false, this.type === RoomType.RANK_GAME))
+            self.send(Serialize.CreateGameObject(user, false, this.type === RoomType.RANK_GAME))
         }
     }
 
