@@ -87,14 +87,7 @@ global.Room = (function () {
         }
 
         setting() {
-            switch (this.type) {
-                case RoomType.GAME:
-                    this.mode = new GameMode(this.index)
-                    break
-                case RoomType.RANK_GAME:
-                    this.mode = new GameMode(this.index)
-                    break
-            }
+            this.mode = new GameMode(this.index, this.type)
         }
 
         addEvent(event) {

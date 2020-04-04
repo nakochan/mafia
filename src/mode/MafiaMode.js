@@ -786,7 +786,7 @@ module.exports = class RescueMode {
                 else
                     user.reward.point -= 100
             }
-            user.send(Serialize.ResultGame(winner, rank, exp, coin, users))
+            user.send(Serialize.ResultGame(winner, users))
         }
     }
 

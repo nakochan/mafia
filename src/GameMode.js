@@ -3,10 +3,10 @@ const Serialize = require('./protocol/Serialize')
 const MafiaMode = require('./mode/MafiaMode')
 
 module.exports = class GameMode {
-    constructor(roomId) {
+    constructor(roomId, type) {
         this.roomId = roomId
         this.count = 0
-        this.type = 0
+        this.type = type
         this.room = Room.get(this.roomId)
     }
 
