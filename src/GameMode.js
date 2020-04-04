@@ -16,12 +16,6 @@ module.exports = class GameMode {
     }
 
     join(self) {
-        if (this.type === RoomType.RANK_GAME) {
-            const tempNames = ['김개똥', '석석동', '강강라', '아주박', '순철진', '나동탁', '검준모', '이진창', '영불손', '아간나', '임식봉', '유죽내', '앙선동', '무진라', '아삭개']
-            const i = Math.floor(Math.random() * tempNames.length)
-            self.name = tempNames[i]
-        } else
-            self.name = self.pureName
         self.game = {}
         self.setGraphics(self.pureGraphics)
         this.moveToBase(self)
@@ -49,7 +43,7 @@ module.exports = class GameMode {
     }
 
     gameChat(self, message) {
-        this.room.publish(Serialize.ChatMessage(self.type, self.index, `<color=#99D9EA>${self.pick}. ${self.name}</color>`, message))
+        this.room.publish(Serialize.ChatMessage(self.type, self.index, `${self.pick}. ${self.name}`, message, '#99D9EA'))
     }
 
     hit(self, target) {

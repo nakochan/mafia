@@ -382,7 +382,7 @@ module.exports = class RescueMode {
         self.send(Serialize.NoticeMessage(target.pick + '. ' + target.name + '님을 대상으로 지정했습니다.'))
         if (self.game.job === JobType.MAFIA) {
             target.game.suspect = self
-            room.publish(Serialize.PlaySound(2, 'Gun'))
+            this.room.publish(Serialize.PlaySound(2, 'Gun'))
         }
         if (self.game.job === JobType.POLICE) {
             if (target.game.job === JobType.MAFIA)
@@ -391,7 +391,7 @@ module.exports = class RescueMode {
                 self.send(Serialize.SystemMessage(target.name + '님은 마피아가 아닙니다.', 'red'))
         }
         if (self.game.job === JobType.DOCTOR)
-            room.publish(Serialize.PlaySound(2, 'magical21'))
+            this.room.publish(Serialize.PlaySound(2, 'magical21'))
         if (self.game.job === JobType.SPIRIT) {
             if (this.days <= 1)
                 return self.send(Serialize.SystemMessage('두번째 날부터 직업을 알아낼 수 있습니다.', 'red'))
@@ -765,9 +765,9 @@ module.exports = class RescueMode {
         }
         Room.remove(this.room)
         for (const user of users) {
-            user.score.sum += user.game.dead ? 100 : this.days * 50
+            user.score.sum += user.game.dead ? 100 : (this.days * 50)
             if (winner === user.game.team)
-                user.score += 200
+                user.score.sum += 200
         }
         const ranks = users.sort((a, b) => b.score.sum - a.score.sum)
         for (const user of users) {
