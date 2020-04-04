@@ -91,6 +91,9 @@ global.Room = (function () {
                 case RoomType.GAME:
                     this.mode = new GameMode(this.index)
                     break
+                case RoomType.RANK_GAME:
+                    this.mode = new GameMode(this.index)
+                    break
             }
         }
 
@@ -238,7 +241,6 @@ global.Room = (function () {
             this.addUser(self)
             this.mode.join(self)
             this.publish(Serialize.UpdateRoomUserCount(this.users.length))
-            console.log(this.index + " 방 인덱스")
             self.send(Serialize.GetRoomInfo(this, self.pick))
         }
 
