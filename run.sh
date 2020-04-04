@@ -1,3 +1,3 @@
 #!/bin/bash
 
-node app.js
+node --max-old-space-size=4096 app.js
