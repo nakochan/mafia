@@ -105,14 +105,23 @@ module.exports = class RescueMode {
                 self.setGraphics(self.deadGraphics)
                 break
         }
+        console.log("A")
         this.moveToDay(self)
+        console.log("B")
         self.publishToMap(Serialize.SetGameTeam(self))
+        console.log("C")
         self.send(Serialize.UpdateModeInfo(self.game.job, this))
+        console.log("D")
         self.send(Serialize.ModeData(this))
+        console.log("E")
         self.send(Serialize.ToggleHit(false))
+        console.log("F")
         self.send(Serialize.ToggleTime(false))
+        console.log("G")
         self.send(Serialize.GetUserJobMemo(this.room.users, true))
+        console.log("H")
         this.room.broadcast(self, Serialize.SetUpUserJobMemo(self, true))
+        console.log("I")
     }
 
     leave(self) {
@@ -556,7 +565,7 @@ module.exports = class RescueMode {
             if (user.game.threat)
                 user.send(Serialize.SystemMessage('조폭에게 협박을 당해 낮에 투표할 수 없습니다!!!', 'red'))
             else
-                user.send(Serialize.GetVote(this.onlyLivingUser()))
+                user.send(Serialize.GetVote(this.onlyLivingUser(), true))
         }
         this.room.publish(Serialize.ToggleTime(false))
         this.room.publish(Serialize.ModeData(this))
@@ -753,7 +762,7 @@ module.exports = class RescueMode {
             if (winner === user.game.team)
                 user.score.sum += 200
         }
-        const ranks = users.sort((a, b) => b.score.sum - a.score.sum)
+        // const ranks = users.sort((a, b) => b.score.sum - a.score.sum)
         for (const user of users) {
             let exp = 100 + user.score.sum
             let coin = 50 + parseInt(user.score.sum / 2)
@@ -761,7 +770,7 @@ module.exports = class RescueMode {
                 exp = 100
             if (coin < 50)
                 coin = 50
-            const rank = ranks.indexOf(user) + 1
+            // const rank = ranks.indexOf(user) + 1
             user.reward.exp = exp
             user.reward.coin = coin
             if (winner === user.game.team)

@@ -773,7 +773,7 @@ module.exports = class RescueMode {
             if (winner === user.game.team)
                 user.score.sum += 200
         }
-        const ranks = users.sort((a, b) => b.score.sum - a.score.sum)
+        // const ranks = users.sort((a, b) => b.score.sum - a.score.sum)
         for (const user of users) {
             let exp = 100 + user.score.sum
             let coin = 50 + parseInt(user.score.sum / 2)
@@ -781,7 +781,7 @@ module.exports = class RescueMode {
                 exp = 100
             if (coin < 50)
                 coin = 50
-            const rank = ranks.indexOf(user) + 1
+            // const rank = ranks.indexOf(user) + 1
             user.reward.exp = exp
             user.reward.coin = coin
             user.send(Serialize.ResultGame(winner, users))

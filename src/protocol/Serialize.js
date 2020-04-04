@@ -538,12 +538,12 @@ my.GetRoomInfo = function (room, pick = 0) {
     return JSON.stringify(packet)
 }
 
-my.GetVote = function (users = []) {
+my.GetVote = function (users = [], hide = false) {
     const packet = {}
     packet._head = ToClient.GET_VOTE
     packet.users = users.map(i => ({
         index: i.index,
-        name: i.pick + '. ' + i.name
+        name: hide ? i.pick + '번' : i.pick + '. ' + i.name
     }))
     return JSON.stringify(packet)
 }
