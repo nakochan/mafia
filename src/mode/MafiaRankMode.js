@@ -387,8 +387,8 @@ module.exports = class MafiaRankMode {
             else
                 self.send(Serialize.SystemMessage(target.pick + '번님은 마피아가 아닙니다.', 'red'))
         }
-        if (self.game.job === JobType.DOCTOR)
-            this.room.publish(Serialize.PlaySound(2, 'magical21'))
+        //if (self.game.job === JobType.DOCTOR)
+        //   this.room.publish(Serialize.PlaySound(2, 'magical21'))
         if (self.game.job === JobType.SPIRIT) {
             if (this.days <= 1)
                 return self.send(Serialize.SystemMessage('두번째 날부터 직업을 알아낼 수 있습니다.', 'red'))
@@ -604,13 +604,13 @@ module.exports = class MafiaRankMode {
         const dieCount = this.onlyLivingUser().filter(user => user.x < 10).length
         if (saveCount < dieCount) {
             if (this.target.game.job === JobType.MAFIA)
-                this.room.publish(Serialize.SystemMessage('마피아를 찾아냈습니다!!!', 'red'))
+                this.room.publish(Serialize.SystemMessage('과반수의 찬성으로 사형을 집행합니다.', 'red'))
             else if (this.target.game.job === JobType.LAWYER) {
-                this.room.publish(Serialize.SystemMessage('변호사를 사형 집행을 할 수 없습니다.', 'red'))
+                this.room.publish(Serialize.SystemMessage('변호사를 사형 집행할 수 없습니다.', 'red'))
                 return this.deathPenalty()
             } else if (this.target.game.job === JobType.TERRORIST) {
-                this.room.publish(Serialize.SystemMessage('그는 테러리스트였다...! 으아악. 모두 피해!!!', 'red'))
-                this.room.publish(Serialize.PlaySound(2, 'Explode'))
+                this.room.publish(Serialize.SystemMessage('과반수의 찬성으로 사형을 집행합니다.', 'red'))
+                //this.room.publish(Serialize.PlaySound(2, 'Explode'))
                 const terror = this.target.game.vote
                 if (terror) {
                     if (terror !== this.target) {
@@ -623,7 +623,7 @@ module.exports = class MafiaRankMode {
                     }
                 }
             } else
-                this.room.publish(Serialize.SystemMessage('선량한 시민이 죽었습니다...', 'red'))
+                this.room.publish(Serialize.SystemMessage('과반수의 찬성으로 사형을 집행합니다.', 'red'))
             this.target.game.dead = true
             this.target.setGraphics(this.target.deadGraphics)
             this.room.publish(Serialize.SetUpUserJobMemo(this.target, true))
@@ -754,20 +754,22 @@ module.exports = class MafiaRankMode {
         }
         // const ranks = users.sort((a, b) => b.score.sum - a.score.sum)
         for (const user of users) {
-            let exp = 100 + user.score.sum
-            let coin = 50 + parseInt(user.score.sum / 2)
-            if (exp < 100)
-                exp = 100
-            if (coin < 50)
-                coin = 50
-            // const rank = ranks.indexOf(user) + 1
-            user.reward.exp = exp
-            user.reward.coin = coin
-            user.reward.point = winner === user.game.team ? 10 : -10
-            if (winner === user.game.team)
-                user.score.rankWin = 1
-            else
-                user.score.rankLose = 1
+            if (user.game.job !== JobType.DEFAULT) {
+                let exp = 100 + user.score.sum
+                let coin = 50 + parseInt(user.score.sum / 2)
+                if (exp < 100)
+                    exp = 100
+                if (coin < 50)
+                    coin = 50
+                // const rank = ranks.indexOf(user) + 1
+                user.reward.exp = exp
+                user.reward.coin = coin
+                user.reward.point = winner === user.game.team ? 10 : -10
+                if (winner === user.game.team)
+                    user.score.rankWin = 1
+                else
+                    user.score.rankLose = 1
+            }
             user.send(Serialize.ResultGame(this.room.type, winner, users, true))
         }
     }
