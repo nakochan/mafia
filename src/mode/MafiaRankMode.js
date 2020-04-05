@@ -111,7 +111,6 @@ module.exports = class MafiaRankMode {
         self.send(Serialize.ModeData(this))
         self.send(Serialize.ToggleHit(false))
         self.send(Serialize.ToggleTime(false))
-        self.send(Serialize.GetUserJobMemo(this.room.users, true))
         this.room.broadcast(self, Serialize.SetUpUserJobMemo(self, true))
     }
 

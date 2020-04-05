@@ -119,7 +119,6 @@ module.exports = class MafiaMode {
         self.send(Serialize.ModeData(this))
         self.send(Serialize.ToggleHit(false))
         self.send(Serialize.ToggleTime(false))
-        self.send(Serialize.GetUserJobMemo(this.room.users))
         this.room.broadcast(self, Serialize.SetUpUserJobMemo(self))
     }
 

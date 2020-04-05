@@ -1018,7 +1018,7 @@ global.User = (function () {
             if (!this.roomId)
                 return
             const room = Room.get(this.roomId)
-            this.send(Serialize.GetUserJobMemo(room.users))
+            this.send(Serialize.GetUserJobMemo(room.users, room.type === RoomType.RANK_GAME))
         }
 
         portal(place, x, y, dx = 0, dy = 0) {
