@@ -115,6 +115,7 @@ module.exports = class MafiaRankMode {
     }
 
     leave(self) {
+        this.removeSignAndOtherSelf(self)
         switch (self.game.team) {
             case TeamType.MAFIA:
                 this.mafiaTeam.splice(this.mafiaTeam.indexOf(self), 1)
@@ -127,7 +128,6 @@ module.exports = class MafiaRankMode {
             this.result(TeamType.CITIZEN)
         self.game = {}
         self.setGraphics(self.pureGraphics)
-        this.removeSignAndOtherSelf(self)
         this.room.publish(Serialize.RemoveUserJobMemo(self.pick))
     }
 
@@ -501,7 +501,7 @@ module.exports = class MafiaRankMode {
     }
 
     ready() {
-        //this.room.lock = true
+        this.room.lock = true
         this.init()
         const slice = this.room.users.slice(0)
         const users = slice.sort(() => 0.5 - Math.random())
@@ -763,10 +763,11 @@ module.exports = class MafiaRankMode {
             // const rank = ranks.indexOf(user) + 1
             user.reward.exp = exp
             user.reward.coin = coin
+            user.reward.point = winner === user.game.team ? 10 : -10
             if (winner === user.game.team)
-                user.reward.point = 100
+                user.score.rankWin = 1
             else
-                user.reward.point -= 100
+                user.score.rankLose = 1
             user.send(Serialize.ResultGame(this.room.type, winner, users, true))
         }
     }

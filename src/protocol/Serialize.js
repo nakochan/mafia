@@ -19,13 +19,10 @@ my.UserData = function (user) {
     packet.point = user.point
     packet.win = user.win
     packet.lose = user.lose
-    packet.kill = user.kill
-    packet.death = user.death
-    packet.assist = user.assist
-    packet.blast = user.blast
-    packet.rescue = user.rescue
-    packet.survive = user.survive
     packet.escape = user.escape
+    packet.rankWin = user.rankWin
+    packet.rankLose = user.rankLose
+    packet.rankEscape = user.rankEscape
     packet.graphics = user.graphics
     packet.pureGraphics = user.pureGraphics
     packet.deadGraphics = user.deadGraphics
@@ -433,8 +430,12 @@ my.GetRank = function (ranks = []) {
         level: r.level,
         exp: r.exp,
         point: r.point,
-        kill: r.kill,
-        death: r.death,
+        win: r.win,
+        lose: r.lose,
+        escape: r.escape,
+        rankWin: r.rankWin,
+        rankLose: r.rankLose,
+        rankEscape: r.rankEscape,
         avatar: r.avatar
     }))
     return JSON.stringify(packet)
@@ -449,9 +450,12 @@ my.GetUserInfoRank = function (user, maxExp) {
     packet.level = user.level
     packet.exp = user.exp
     packet.maxExp = maxExp
-    packet.kill = user.kill
-    packet.death = user.death
-    packet.assist = user.assist
+    packet.win = user.win
+    packet.lose = user.lose
+    packet.escape = user.escape
+    packet.rankWin = user.rankWin
+    packet.rankLose = user.rankLose
+    packet.rankEscape = user.rankEscape
     packet.likes = user.likes
     packet.memo = user.memo
     packet.avatar = user.avatar

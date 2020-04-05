@@ -41,14 +41,10 @@ global.User = (function () {
             this.point = 0
             this.win = 0
             this.lose = 0
-            this.kill = 0
-            this.death = 0
-            this.assist = 0
-            this.blast = 0
-            this.rescue = 0
-            this.rescueCombo = 0
-            this.survive = 0
             this.escape = 0
+            this.rankWin = 0
+            this.rankLose = 0
+            this.rankEscape = 0
             this.graphics = 'KJT'
             this.pureGraphics = this.graphics
             this.deadGraphics = 'Cat'
@@ -165,14 +161,10 @@ global.User = (function () {
             this.point = user.point
             this.win = user.win
             this.lose = user.lose
-            this.kill = user.kill
-            this.death = user.death
-            this.assist = user.assist
-            this.blast = user.blast
-            this.rescue = user.rescue
-            this.rescueCombo = user.rescue_combo
-            this.survive = user.survive
             this.escape = user.escape
+            this.rankWin = user.rankWin
+            this.rankLose = user.rankLose
+            this.rankEscape = user.rankEscape
             this.graphics = user.pure_graphics
             this.pureGraphics = user.pure_graphics
             this.deadGraphics = user.dead_graphics
@@ -207,7 +199,7 @@ global.User = (function () {
         async createClan(name) {
             if (this.clanId)
                 return
-            if (this.coin < 5000)
+            if (this.coin < 2000)
                 return this.send(Serialize.MessageClan('NOT_ENOUGH_COIN'))
             if (name.length < 1 || name.length > 12)
                 return this.send(Serialize.MessageClan('AN_IMPOSSIBLE_LENGTH'))
@@ -218,7 +210,7 @@ global.User = (function () {
             const clan = await Clan.create(this.id, name)
             if (!clan)
                 return
-            this.coin -= 5000
+            this.coin -= 2000
             this.clan = clan
             let members = []
             for (let i = 0; i < this.clan.members.length; ++i) {

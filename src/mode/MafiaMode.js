@@ -123,6 +123,7 @@ module.exports = class MafiaMode {
     }
 
     leave(self) {
+        this.removeSignAndOtherSelf(self)
         switch (self.game.team) {
             case TeamType.MAFIA:
                 this.mafiaTeam.splice(this.mafiaTeam.indexOf(self), 1)
@@ -135,7 +136,6 @@ module.exports = class MafiaMode {
             this.result(TeamType.CITIZEN)
         self.game = {}
         self.setGraphics(self.pureGraphics)
-        this.removeSignAndOtherSelf(self)
         this.room.publish(Serialize.RemoveUserJobMemo(self.pick))
     }
 
@@ -287,9 +287,9 @@ module.exports = class MafiaMode {
                         selfHide = false
                     if (self.game.job === JobType.SPY && user.game.job === JobType.ARMY)
                         selfNameHide = false
-                    if (self.game.dead && !user.game.dead)
+                    if (self.game.dead && !user.game.dead && user.game.job !== JobType.SPIRIT)
                         selfHide = true
-                    if (user.game.dead && !self.game.dead)
+                    if (user.game.dead && !self.game.dead && self.game.job !== JobType.SPIRIT)
                         userHide = true
                     break
                 case STATE_LAST_DITCH:
@@ -304,9 +304,9 @@ module.exports = class MafiaMode {
                         userHide = true
                     break
                 default:
-                    if (self.game.dead && !user.game.dead)
+                    if (self.game.dead && !user.game.dead && user.game.job !== JobType.SPIRIT)
                         selfHide = true
-                    if (user.game.dead && !self.game.dead)
+                    if (user.game.dead && !self.game.dead && self.game.job !== JobType.SPIRIT)
                         userHide = true
                     break
             }
@@ -783,6 +783,10 @@ module.exports = class MafiaMode {
             // const rank = ranks.indexOf(user) + 1
             user.reward.exp = exp
             user.reward.coin = coin
+            if (winner === user.game.team)
+                user.score.win = 1
+            else
+                user.score.lose = 1
             user.send(Serialize.ResultGame(this.room.type, winner, users))
         }
     }
