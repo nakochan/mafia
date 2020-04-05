@@ -12,12 +12,12 @@ const STATE_VOTE = 5
 const STATE_DEATH_PENALTY = 6
 const STATE_RESULT = 7
 
-module.exports = class RescueMode {
+module.exports = class MafiaRankMode {
     constructor(roomId) {
         this.roomId = roomId
         this.state = STATE_READY
         this.map = MapType.TOWN
-        this.mode = ModeType.MAFIA_RANK
+        this.mode = ModeType.MAFIA
         this.tick = 0
         this.count = 30
         this.maxCount = 30
@@ -105,23 +105,14 @@ module.exports = class RescueMode {
                 self.setGraphics(self.deadGraphics)
                 break
         }
-        console.log("A")
         this.moveToDay(self)
-        console.log("B")
         self.publishToMap(Serialize.SetGameTeam(self))
-        console.log("C")
         self.send(Serialize.UpdateModeInfo(self.game.job, this))
-        console.log("D")
         self.send(Serialize.ModeData(this))
-        console.log("E")
         self.send(Serialize.ToggleHit(false))
-        console.log("F")
         self.send(Serialize.ToggleTime(false))
-        console.log("G")
         self.send(Serialize.GetUserJobMemo(this.room.users, true))
-        console.log("H")
         this.room.broadcast(self, Serialize.SetUpUserJobMemo(self, true))
-        console.log("I")
     }
 
     leave(self) {
@@ -758,7 +749,7 @@ module.exports = class RescueMode {
         }
         Room.remove(this.room)
         for (const user of users) {
-            user.score.sum += user.game.dead ? 100 : (this.days * 50)
+            user.score.sum += user.game.dead ? 100 : (this.days * 20)
             if (winner === user.game.team)
                 user.score.sum += 200
         }
@@ -777,7 +768,7 @@ module.exports = class RescueMode {
                 user.reward.point = 100
             else
                 user.reward.point -= 100
-            user.send(Serialize.ResultGame(winner, users))
+            user.send(Serialize.ResultGame(this.room.type, winner, users, true))
         }
     }
 

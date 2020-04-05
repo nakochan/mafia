@@ -15,7 +15,7 @@ const STATE_VOTE = 5
 const STATE_DEATH_PENALTY = 6
 const STATE_RESULT = 7
 
-module.exports = class RescueMode {
+module.exports = class MafiaMode {
     constructor(roomId) {
         this.roomId = roomId
         this.state = STATE_READY
@@ -769,9 +769,9 @@ module.exports = class RescueMode {
         }
         Room.remove(this.room)
         for (const user of users) {
-            user.score.sum += user.game.dead ? 100 : (this.days * 50)
+            user.score.sum += user.game.dead ? 100 : (this.days * 10)
             if (winner === user.game.team)
-                user.score.sum += 200
+                user.score.sum += 100
         }
         // const ranks = users.sort((a, b) => b.score.sum - a.score.sum)
         for (const user of users) {
@@ -784,7 +784,7 @@ module.exports = class RescueMode {
             // const rank = ranks.indexOf(user) + 1
             user.reward.exp = exp
             user.reward.coin = coin
-            user.send(Serialize.ResultGame(winner, users))
+            user.send(Serialize.ResultGame(this.room.type, winner, users))
         }
     }
 

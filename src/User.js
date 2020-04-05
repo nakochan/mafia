@@ -1042,10 +1042,13 @@ global.User = (function () {
                 return
             switch (ad) {
                 case 1:
-                    this.entry(RoomType.GAME)
+                    this.reward.cash += 10
                     break
                 case 2:
-                    this.reward.cash += 10
+                    this.entry(RoomType.GAME)
+                    break
+                case 3:
+                    this.entry(RoomType.RANK_GAME)
                     break
             }
             this.reward.send(this)

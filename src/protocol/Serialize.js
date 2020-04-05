@@ -1,4 +1,4 @@
-const { TeamType } = require('../util/const')
+const { TeamType, RoomType } = require('../util/const')
 const ToClient = require('./ToClient')
 const moment = require('moment')
 const my = {}
@@ -269,15 +269,16 @@ my.DeadAnimation = function () {
     return JSON.stringify(packet)
 }
 
-my.ResultGame = function (winner, users) {
+my.ResultGame = function (type, winner, users, hide = false) {
     const packet = {}
     packet._head = ToClient.RESULT_GAME
+    packet.type = type
     packet.winner = winner
     packet.users = users.map(u => ({
         index: u.index,
         pick: u.pick,
-        name: u.name,
-        clanname: u.clanname || '',
+        name: hide ? u.pick + '번' : u.name,
+        clanname: hide ? '' : (u.clanname || ''),
         //score: (u.hasOwnProperty('score') && u.score.hasOwnProperty('sum')) ? u.score.sum : 0,
         job: (u.hasOwnProperty('game') && u.game.hasOwnProperty('job')) ? u.game.job : 0
     }))
@@ -534,6 +535,7 @@ my.GetRoomInfo = function (room, pick = 0) {
     packet.type = room.type
     packet.name = room.name
     packet.max = room.max
+    packet.rank = room.type === RoomType.RANK_GAME
     packet.voice = room.voice
     return JSON.stringify(packet)
 }
