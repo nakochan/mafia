@@ -70,7 +70,7 @@ module.exports = class GameMode {
     }
 
     update() {
-        const min = this.type === RoomType.RANK_GAME ? 1 : 4
+        const min = this.type === RoomType.RANK_GAME ? 8 : 4
         if (this.room.users.length >= min) {
             if (this.type === RoomType.RANK_GAME)
                 return this.room.changeMode(MafiaRankMode)
