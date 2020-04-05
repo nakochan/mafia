@@ -1289,6 +1289,21 @@
                 "command": "",
                 "arguments": {}
             }
+        },
+        {
+            "id": 87,
+            "type": "SKIN",
+            "icon": "Myo",
+            "name": "묘",
+            "creator": "포뇨",
+            "creatorId": 0,
+            "description": "",
+            "cost": 50,
+            "isCash": true,
+            "method": {
+                "command": "",
+                "arguments": {}
+            }
         }
     ]
 }

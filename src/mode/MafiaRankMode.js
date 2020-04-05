@@ -502,7 +502,7 @@ module.exports = class MafiaRankMode {
     }
 
     ready() {
-        this.room.lock = true
+        //this.room.lock = true
         this.init()
         const slice = this.room.users.slice(0)
         const users = slice.sort(() => 0.5 - Math.random())
